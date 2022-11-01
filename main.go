@@ -4,6 +4,8 @@ import (
 	"flag"
 	"os"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/opensourceways/community-robot-lib/logrusutil"
 	liboptions "github.com/opensourceways/community-robot-lib/options"
 	"github.com/opensourceways/xihe-inference-evaluate/client"
@@ -11,7 +13,6 @@ import (
 	"github.com/opensourceways/xihe-inference-evaluate/controller"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/watchimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/server"
-	"github.com/sirupsen/logrus"
 )
 
 type options struct {
@@ -62,7 +63,7 @@ func main() {
 	// cfg
 	cfg := new(config.Config)
 	if err := config.LoadConfig(o.service.ConfigFile, cfg); err != nil {
-		log.Fatalf("load config, err:%s", err.Error())
+		logrus.Fatalf("load config, err:%s", err.Error())
 	}
 
 	// controller

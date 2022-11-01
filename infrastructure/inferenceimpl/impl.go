@@ -3,15 +3,12 @@ package inferenceimpl
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/opensourceways/xihe-inference-evaluate/client"
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
 	"github.com/opensourceways/xihe-inference-evaluate/domain/inference"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 )
 
 const MetaNameInference = "inference"
@@ -25,7 +22,7 @@ type inferenceImpl struct {
 
 func (impl inferenceImpl) Create(infer *domain.Inference) error {
 	cli := client.GetDyna()
-	resource, err, res := impl.GetResource()
+	resource, err, res := client.GetResource()
 	if err != nil {
 		return err
 	}
@@ -45,7 +42,7 @@ func (impl inferenceImpl) Create(infer *domain.Inference) error {
 
 func (impl inferenceImpl) ExtendExpiry(infer *domain.InferenceIndex, expiry int64) error {
 	cli := client.GetDyna()
-	resource, err, _ := impl.GetResource()
+	resource, err, _ := client.GetResource()
 	if err != nil {
 		return err
 	}
@@ -66,34 +63,6 @@ func (impl inferenceImpl) ExtendExpiry(infer *domain.InferenceIndex, expiry int6
 		return err
 	}
 	return nil
-}
-
-func (impl inferenceImpl) GetResource() (schema.GroupVersionResource, error, *unstructured.Unstructured) {
-	k, err, res := impl.resource()
-	if err != nil {
-		return schema.GroupVersionResource{}, err, nil
-	}
-
-	mapping, err := client.GetrestMapper().RESTMapping(k.GroupKind(), k.Version)
-	if err != nil {
-		return schema.GroupVersionResource{}, err, nil
-	}
-
-	return mapping.Resource, nil, res
-}
-
-func (impl inferenceImpl) resource() (kind *schema.GroupVersionKind, err error, _ *unstructured.Unstructured) {
-	var yamldata []byte
-	yamldata, err = ioutil.ReadFile("crd-resource.yaml")
-	if err != nil {
-		return nil, err, nil
-	}
-	obj := &unstructured.Unstructured{}
-	_, kind, err = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(yamldata, nil, obj)
-	if err != nil {
-		return nil, err, nil
-	}
-	return kind, nil, obj
 }
 
 func (impl inferenceImpl) geneMetaName(index *domain.InferenceIndex) string {
