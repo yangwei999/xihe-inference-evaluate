@@ -2,5 +2,5 @@ package watchimpl
 
 type Config struct {
 	// RPC Endpoint
-	Endpoint string `json:"endpoint" required:"true"`
+	InferenceEndpoint string `json:"inference_endpoint" required:"true"`
 }
