@@ -44,7 +44,7 @@ func (t InferenceEvaluate) CreateInference(opt *InferenceCreateOption) error {
 	return t.forwardTo(req, nil)
 }
 
-func (t InferenceEvaluate) ExtendExpiryOfInference(opt *InferenceCreateOption) error {
+func (t InferenceEvaluate) ExtendExpiryOfInference(opt *InferenceUpdateOption) error {
 	payload, err := utils.JsonMarshal(&opt)
 	if err != nil {
 		return err
