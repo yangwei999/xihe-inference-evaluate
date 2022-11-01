@@ -31,7 +31,7 @@ func (impl inferenceImpl) Create(infer *domain.Inference) error {
 	}
 
 	res.Object["metadata"] = map[string]interface{}{
-		"name":   impl.geneMetaName(infer),
+		"name":   impl.geneMetaName(&infer.InferenceIndex),
 		"labels": impl.GeneLabels(infer),
 	}
 
@@ -43,7 +43,7 @@ func (impl inferenceImpl) Create(infer *domain.Inference) error {
 	return nil
 }
 
-func (impl inferenceImpl) ExtendExpiry(infer *domain.Inference, expiry int64) error {
+func (impl inferenceImpl) ExtendExpiry(infer *domain.InferenceIndex, expiry int64) error {
 	cli := client.GetDyna()
 	resource, err, _ := impl.GetResource()
 	if err != nil {
@@ -96,8 +96,8 @@ func (impl inferenceImpl) resource() (kind *schema.GroupVersionKind, err error, 
 	return kind, nil, obj
 }
 
-func (impl inferenceImpl) geneMetaName(infer *domain.Inference) string {
-	return fmt.Sprintf("%s-%s-%s-%s", MetaNameInference, infer.Project.Owner.Account(), infer.ProjectName.ProjectName(), infer.Id)
+func (impl inferenceImpl) geneMetaName(index *domain.InferenceIndex) string {
+	return fmt.Sprintf("%s-%s", MetaNameInference, index.Id)
 }
 
 func (impl inferenceImpl) GeneLabels(infer *domain.Inference) map[string]string {
