@@ -75,5 +75,5 @@ func (s inferenceService) Create(cmd *InferenceCreateCmd) error {
 }
 
 func (s inferenceService) ExtendExpiry(cmd *InferenceUpdateCmd) error {
-	return s.manager.ExtendExpiry(&cmd.InferenceIndex, cmd.Expiry)
+	return s.manager.ExtendExpiry(&cmd.Inference, cmd.Expiry)
 }

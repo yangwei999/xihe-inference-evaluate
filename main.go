@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/opensourceways/xihe-inference-evaluate/client"
 	"os"
 
 	"github.com/opensourceways/community-robot-lib/logrusutil"
@@ -40,6 +41,11 @@ func gatherOptions(fs *flag.FlagSet, args ...string) options {
 func main() {
 	logrusutil.ComponentInit("xihe")
 	log := logrus.NewEntry(logrus.StandardLogger())
+
+	err := client.Init()
+	if err != nil {
+		logrus.Fatalf("k8s client init, err:%s", err.Error())
+	}
 
 	o := gatherOptions(
 		flag.NewFlagSet(os.Args[0], flag.ExitOnError),
