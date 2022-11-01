@@ -54,7 +54,7 @@ type StatusDetail struct {
 }
 
 func NewWatcher(cfg *Config) *Watcher {
-	resource, _, _ := client.GetResource()
+	resource := client.GetResource2()
 	return &Watcher{
 		res:      client.GetClient(),
 		config:   client.GetK8sConfig(),
