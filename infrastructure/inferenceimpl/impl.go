@@ -133,7 +133,7 @@ func (impl inferenceImpl) GetObj(cfg *Config, infer *domain.Inference) (*unstruc
 		ObsBucket:      cfg.OBS.Bucket,
 		ObsLfsPath:     cfg.OBS.LFSPath,
 		StorageSize:    10,
-		RecycleSeconds: 60,
+		RecycleSeconds: infer.SurvivalTime,
 	}
 
 	buf := new(bytes.Buffer)

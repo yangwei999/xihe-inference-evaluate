@@ -9,7 +9,6 @@ type Config struct {
 	OBS            OBSConfig `json:"obs"              required:"true"`
 	Image          string    `json:"image"            required:"true"`
 	GitlabEndpoint string    `json:"gitlab_endpiont"  required:"true"`
-	Image          string    `json:"image"            required:"true"`
 }
 
 type OBSConfig struct {
