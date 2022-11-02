@@ -51,9 +51,9 @@ spec:
       - name: EVALUATE_TYPE
         value: {{.EvaluateType}}
       - name: LEARNING_RATE_SCOPE
-        value: {{.LearningScope}}
+        value: "{{.LearningScope}}"
       - name: BATCH_SIZE_SCOPE
-        value: {{.BatchScope}}
+        value: "{{.BatchScope}}"
       - name: MOMENTUM_SCOPE
-        value: {{.MomentumScope}}
+        value: "{{.MomentumScope}}"
 
