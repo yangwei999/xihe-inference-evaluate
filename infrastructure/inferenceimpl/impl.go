@@ -1,10 +1,15 @@
 package inferenceimpl
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"html/template"
+	"io/ioutil"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 
 	"github.com/opensourceways/xihe-inference-evaluate/client"
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
@@ -13,24 +18,43 @@ import (
 
 const MetaNameInference = "inference"
 
+type CrdData struct {
+	Group          string
+	Version        string
+	Name           string
+	NameSpace      string
+	Image          string
+	GitlabEndPoint string
+	XiheUser       string
+	XiheUserToken  string
+	ProjectName    string
+	LastCommit     string
+	ObsAk          string
+	ObsSk          string
+	ObsEndPoint    string
+	ObsUtilPath    string
+	ObsBucket      string
+	ObsLfsPath     string
+	StorageSize    int
+	RecycleSeconds int
+	Labels         map[string]string
+}
+
 func NewInference(cfg *Config) inference.Inference {
-	return inferenceImpl{}
+	return inferenceImpl{
+		cfg: cfg,
+	}
 }
 
 type inferenceImpl struct {
+	cfg *Config
 }
 
 func (impl inferenceImpl) Create(infer *domain.Inference) error {
 	cli := client.GetDyna()
-	resource, err, res := client.GetResource()
-	if err != nil {
-		return err
-	}
+	resource := client.GetResource2()
 
-	res.Object["metadata"] = map[string]interface{}{
-		"name":   impl.geneMetaName(&infer.InferenceIndex),
-		"labels": impl.GeneLabels(infer),
-	}
+	res, err := impl.GetObj(impl.cfg, infer)
 
 	dr := cli.Resource(resource).Namespace("default")
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
@@ -42,10 +66,7 @@ func (impl inferenceImpl) Create(infer *domain.Inference) error {
 
 func (impl inferenceImpl) ExtendSurvivalTime(infer *domain.InferenceIndex, timeToExtend int) error {
 	cli := client.GetDyna()
-	resource, err, _ := client.GetResource()
-	if err != nil {
-		return err
-	}
+	resource := client.GetResource2()
 
 	get, err := cli.Resource(resource).Namespace("default").Get(context.TODO(), impl.geneMetaName(infer), metav1.GetOptions{})
 	if err != nil {
@@ -54,7 +75,7 @@ func (impl inferenceImpl) ExtendSurvivalTime(infer *domain.InferenceIndex, timeT
 
 	if sp, ok := get.Object["spec"]; ok {
 		if spc, ok := sp.(map[string]interface{}); ok {
-			spc["add"] = true
+			spc["increaseRecycleSeconds"] = true
 			spc["recycleAfterSeconds"] = timeToExtend
 		}
 	}
@@ -77,4 +98,53 @@ func (impl inferenceImpl) GeneLabels(infer *domain.Inference) map[string]string 
 	m["last_commit"] = infer.LastCommit
 	m["type"] = MetaNameInference
 	return m
+}
+
+func (impl inferenceImpl) GetObj(cfg *Config, infer *domain.Inference) (*unstructured.Unstructured, error) {
+	name := impl.geneMetaName(&infer.InferenceIndex)
+	labels := impl.GeneLabels(infer)
+
+	txtStr, err := ioutil.ReadFile("./crd-resource.yaml")
+	if err != nil {
+		return nil, err
+	}
+
+	tmpl, err := template.New("crd").Parse(string(txtStr))
+	if err != nil {
+		return nil, err
+	}
+
+	var data = &CrdData{
+		Group:          client.CrdGroup,
+		Version:        client.CrdVersion,
+		Name:           name,
+		NameSpace:      "default",
+		Image:          cfg.Image,
+		GitlabEndPoint: cfg.GitlabEndpoint,
+		XiheUser:       infer.Project.Owner.Account(),
+		XiheUserToken:  infer.UserToken,
+		ProjectName:    infer.ProjectName.ProjectName(),
+		LastCommit:     infer.LastCommit,
+		ObsAk:          cfg.OBS.AccessKey,
+		ObsSk:          cfg.OBS.SecretKey,
+		ObsEndPoint:    cfg.OBS.Endpoint,
+		ObsUtilPath:    cfg.OBS.OBSUtilPath,
+		ObsBucket:      cfg.OBS.Bucket,
+		ObsLfsPath:     cfg.OBS.LFSPath,
+		StorageSize:    10,
+		RecycleSeconds: infer.SurvivalTime,
+		Labels:         labels,
+	}
+
+	buf := new(bytes.Buffer)
+	if err := tmpl.Execute(buf, data); err != nil {
+		return nil, err
+	}
+
+	obj := &unstructured.Unstructured{}
+	_, _, err = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(buf.Bytes(), nil, obj)
+	if err != nil {
+		return nil, err
+	}
+	return obj, nil
 }

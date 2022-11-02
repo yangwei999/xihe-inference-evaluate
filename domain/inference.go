@@ -2,7 +2,6 @@ package domain
 
 type Inference struct {
 	InferenceIndex
-
 	ProjectName  ProjectName
 	LastCommit   string
 	UserToken    string
