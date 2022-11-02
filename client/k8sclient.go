@@ -14,6 +14,10 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+const CrdGroup = "cs.opensourceways.com"
+const CrdVersion = "v1alpha1"
+const CrdKind = "CodeServer"
+
 var (
 	k8sConfig *rest.Config
 	k8sClient *kubernetes.Clientset
@@ -76,9 +80,9 @@ func GetK8sConfig() *rest.Config {
 
 func GetResource2() schema.GroupVersionResource {
 	k := schema.GroupVersionKind{
-		Group:   "cs.opensourceways.com",
-		Version: "v1alpha1",
-		Kind:    "CodeServer",
+		Group:   CrdGroup,
+		Version: CrdVersion,
+		Kind:    CrdKind,
 	}
 	mapping, _ := GetrestMapper().RESTMapping(k.GroupKind(), k.Version)
 	return mapping.Resource

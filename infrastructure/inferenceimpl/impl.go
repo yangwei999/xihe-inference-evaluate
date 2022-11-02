@@ -1,12 +1,15 @@
 package inferenceimpl
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
+	"html/template"
+	"io/ioutil"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 
 	"github.com/opensourceways/xihe-inference-evaluate/client"
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
@@ -15,93 +18,27 @@ import (
 
 const MetaNameInference = "inference"
 
-const BaseTemplate = `
-	{
-		"apiVersion": "%s/%s",
-    	"kind": "CodeServer",
-    	"metadata": {
-    		"name": ,
-    		"namespace": %s
-    	},
-    	"spec": {
-    		"runtime": "generic",
-    		"subdomain": ,
-    		"image": "swr.cn-north-4.myhuaweicloud.com/opensourceway/xihe/gradio:51e18ee8a8468a766f3c1958c2ce5274bdd11175",
-    		"storageSize": "%sGi",
-    		"storageName": "emptyDir",
-    		"inactiveAfterSeconds": 0,
-    		"recycleAfterSeconds": %d,
-    		"restartPolicy": "Never",
-    		"resources": {
-    			"requests": {
-    			"cpu": "0.5",
-    			"memory": "512Mi"
-    		}
-			},
-    	"connectProbe": "/",
-    	"workspaceLocation": "/workspace",
-    	"envs": [
-		{
-			"name": "GRADIO_SERVER_PORT",
-			"value": "8080"
-		},
-		{
-			"name": "GRADIO_SERVER_NAME",
-			"value": "0.0.0.0"
-		},
-		{
-			"name": "GITLAB_ENDPOINT",
-			"value": "%s"
-		},
-		{
-			"name": "XIHE_USER",
-			"value": "%s"
-		},
-		{
-			"name": "XIHE_USER_TOKEN",
-			"value": "%s"
-		},
-		{
-			"name": "PROJECT_NAME",
-			"value": "%s"
-		},
-		{
-			"name": "LAST_COMMIT",
-			"value": "%s"
-		},
-		{
-			"name": "OBS_AK",
-			"value": "%s"
-		},
-		{
-			"name": "OBS_SK",
-			"value": "%s"
-		},
-		{
-			"name": "OBS_ENDPOINT",
-			"value": "%s"
-		},
-		{
-			"name": "OBS_UTIL_PATH",
-			"value": "%s"
-		},
-		{
-			"name": "OBS_BUCKET",
-			"value": "%s"
-		},
-		{
-			"name": "OBS_LFS_PATH",
-			"value": "%s"
-		},
-    	],
-    	"command": [
-    	"/bin/bash",
-    	"-c",
-    	"su mindspore\n python3 obs_folder_download.py --source_dir='xihe-obj/projects/%s/%s/inference/' --source_files='%s' --dest='%s' --obs-ak=%s --obs-sk=%s --obs-bucketname=%s --obs-endpoint=%s\n cd /workspace/content\n pip install --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple pip\npip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple\n python3 app.py"
-    		]
-    	}
-    }
-`
+type CrdData struct {
+	Group          string
+	Version        string
+	Name           string
+	NameSpace      string
+	Image          string
+	GitlabEndPoint string
+	XiheUser       string
+	XiheUserToken  string
+	ProjectName    string
+	LastCommit     string
+	ObsAk          string
+	ObsSk          string
+	ObsEndPoint    string
+	ObsUtilPath    string
+	ObsBucket      string
+	ObsLfsPath     string
+	StorageSize    int
+	RecycleSeconds int
+	Labels         map[string]string
+}
 
 func NewInference(cfg *Config) inference.Inference {
 	return inferenceImpl{
@@ -116,12 +53,13 @@ type inferenceImpl struct {
 func (impl inferenceImpl) Create(infer *domain.Inference) error {
 	cli := client.GetDyna()
 	resource := client.GetResource2()
+
 	res, err := impl.GetObj(impl.cfg, infer)
 
-	res.Object["metadata"] = map[string]interface{}{
-		"name":   impl.geneMetaName(&infer.InferenceIndex),
-		"labels": impl.GeneLabels(infer),
-	}
+	//res.Object["metadata"] = map[string]interface{}{
+	//	"name":   impl.geneMetaName(&infer.InferenceIndex),
+	//	"labels": impl.GeneLabels(infer),
+	//}
 
 	dr := cli.Resource(resource).Namespace("default")
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
@@ -142,7 +80,7 @@ func (impl inferenceImpl) ExtendSurvivalTime(infer *domain.InferenceIndex, timeT
 
 	if sp, ok := get.Object["spec"]; ok {
 		if spc, ok := sp.(map[string]interface{}); ok {
-			spc["add"] = true
+			spc["increaseRecycleSeconds"] = true
 			spc["recycleAfterSeconds"] = timeToExtend
 		}
 	}
@@ -168,35 +106,48 @@ func (impl inferenceImpl) GeneLabels(infer *domain.Inference) map[string]string 
 }
 
 func (impl inferenceImpl) GetObj(cfg *Config, infer *domain.Inference) (*unstructured.Unstructured, error) {
-	var yamldata []byte
+	name := impl.geneMetaName(&infer.InferenceIndex)
+	labels := impl.GeneLabels(infer)
 
-	yamldata = []byte(fmt.Sprintf(BaseTemplate,
-		"cs.opensourceways.com",
-		"v1alpha1",
-		"default",
-		"10",
-		60*60*24,
-		cfg.GitlabEndpoint,
-		infer.User,
-		infer.UserToken,
-		infer.ProjectName,
-		infer.LastCommit,
-		cfg.OBS.AccessKey,
-		cfg.OBS.SecretKey,
-		cfg.OBS.Endpoint,
-		cfg.OBS.OBSUtilPath,
-		cfg.OBS.Bucket,
-		cfg.OBS.LFSPath,
-		infer.Project.Owner.Account(),
-		infer.ProjectName,
-		"files_string",
-		"/workspace/content/",
-		cfg.OBS.AccessKey,
-		cfg.OBS.SecretKey,
-		cfg.OBS.Bucket,
-		cfg.OBS.Endpoint))
+	txtStr, err := ioutil.ReadFile("./crd-resource.yaml")
+	if err != nil {
+		return nil, err
+	}
+
+	tmpl, err := template.New("crd").Parse(string(txtStr))
+	if err != nil {
+		return nil, err
+	}
+
+	var data = &CrdData{
+		Group:          client.CrdGroup,
+		Version:        client.CrdVersion,
+		Name:           name,
+		NameSpace:      "default",
+		Image:          cfg.Image,
+		GitlabEndPoint: cfg.GitlabEndpoint,
+		XiheUser:       infer.User,
+		XiheUserToken:  infer.UserToken,
+		ProjectName:    infer.ProjectName.ProjectName(),
+		LastCommit:     infer.LastCommit,
+		ObsAk:          cfg.OBS.AccessKey,
+		ObsSk:          cfg.OBS.SecretKey,
+		ObsEndPoint:    cfg.OBS.Endpoint,
+		ObsUtilPath:    cfg.OBS.OBSUtilPath,
+		ObsBucket:      cfg.OBS.Bucket,
+		ObsLfsPath:     cfg.OBS.LFSPath,
+		StorageSize:    10,
+		RecycleSeconds: infer.SurvivalTime,
+		Labels:         labels,
+	}
+
+	buf := new(bytes.Buffer)
+	if err := tmpl.Execute(buf, data); err != nil {
+		return nil, err
+	}
+
 	obj := &unstructured.Unstructured{}
-	_, _, err := yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(yamldata, nil, obj)
+	_, _, err = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(buf.Bytes(), nil, obj)
 	if err != nil {
 		return nil, err
 	}

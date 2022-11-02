@@ -45,6 +45,7 @@ func (req *InferenceCreateRequest) toCmd() (
 	cmd.UserToken = req.UserToken
 	cmd.LastCommit = req.LastCommit
 	cmd.User = req.User
+	cmd.SurvivalTime = req.SurvivalTime
 
 	err = cmd.Validate()
 
