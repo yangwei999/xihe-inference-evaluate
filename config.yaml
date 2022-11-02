@@ -1,12 +1,16 @@
 inference:
   obs:
     obsutil_path: /home
-    access_key:  sfs
-    secret_key: gdfg
-    endpoint: dgffdg
-    lfs_path: hdfh
-    bucket: dfhdh
-  gitlab_endpiont: dhdfh
+    access_key:  xxxx
+    secret_key: xxxx
+    endpoint: xxxx
+    lfs_path: xxxx
+    bucket: xxxx
+  gitlab_endpiont: xxxx
+  image: ccr.ccs.tencentyun.com/kugo/demo:v5
+
+evaluate:
+  image: ccr.ccs.tencentyun.com/kugo/demo:v5
 
 watch:
-  inference_endpoint: dfhdhgit
+  inference_endpoint: xxxx
