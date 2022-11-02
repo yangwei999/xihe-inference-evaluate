@@ -88,12 +88,12 @@ func (w *Watcher) Update(oldObj, newObj interface{}) {
 
 	bys, err := json.Marshal(newObj)
 	if err != nil {
-		logrus.Error("update marshal error:", err.Error())
+		logrus.Errorf("update marshal error:%s", err.Error())
 		return
 	}
 	err = json.Unmarshal(bys, &res)
 	if err != nil {
-		logrus.Error("update unmarshal error:", err.Error())
+		logrus.Errorf("update unmarshal error:%s", err.Error())
 		return
 	}
 
@@ -101,12 +101,6 @@ func (w *Watcher) Update(oldObj, newObj interface{}) {
 }
 
 func (w *Watcher) dispatcher(res v1.CodeServer) {
-	defer func() {
-		if err := recover(); err != nil {
-			logrus.Panic("dispatcher panic:", err)
-		}
-	}()
-
 	status := w.transferStatus(res)
 	switch res.Labels["type"] {
 	case inferenceimpl.MetaNameInference:
@@ -114,7 +108,6 @@ func (w *Watcher) dispatcher(res v1.CodeServer) {
 	case evaluateimpl.MetaNameEvaluate:
 		w.HandleEvaluate(res.ObjectMeta.Labels, status)
 	}
-
 }
 
 func (w *Watcher) transferStatus(res v1.CodeServer) (status StatusDetail) {
@@ -145,7 +138,7 @@ func (w *Watcher) HandleInference(labels map[string]string, status StatusDetail)
 
 	cli, err := rpcclient.NewInferenceClient(w.nConfig.InferenceEndpoint)
 	if err != nil {
-		logrus.Error("new inference rpc client error:", err.Error())
+		logrus.Errorf("new rpc client error:%s", err.Error())
 	}
 
 	index := inference.InferenceIndex{
@@ -160,9 +153,9 @@ func (w *Watcher) HandleInference(labels map[string]string, status StatusDetail)
 		AccessURL: status.AccessUrl,
 	}
 	if err = cli.SetInferenceInfo(&index, &info); err != nil {
-		logrus.Error("call inference rpc error:", err.Error())
+		logrus.Errorf("call inference rpc error:%s", err.Error())
 	}
-	logrus.Println("handle inference success")
+
 }
 
 func (w *Watcher) HandleEvaluate(labels map[string]string, status StatusDetail) {
@@ -183,7 +176,7 @@ func (w *Watcher) HandleEvaluate(labels map[string]string, status StatusDetail) 
 	if err = cli.SetEvaluateInfo(&index, &info); err != nil {
 		logrus.Error("call evaluate rpc error:", err.Error())
 	}
-	logrus.Println("handle evaluate success")
+
 }
 
 func (w *Watcher) crdConfig() cache.SharedIndexInformer {

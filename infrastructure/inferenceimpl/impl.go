@@ -3,7 +3,6 @@ package inferenceimpl
 import (
 	"context"
 	"fmt"
-
 	"github.com/opensourceways/xihe-inference-evaluate/client"
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
 	"github.com/opensourceways/xihe-inference-evaluate/domain/inference"
@@ -12,6 +11,28 @@ import (
 )
 
 const MetaNameInference = "inference"
+
+type CrdData struct {
+	Group          string
+	Version        string
+	Name           string
+	NameSpace      string
+	Image          string
+	GitlabEndPoint string
+	XiheUser       string
+	XiheUserToken  string
+	ProjectName    string
+	LastCommit     string
+	ObsAk          string
+	ObsSk          string
+	ObsEndPoint    string
+	ObsUtilPath    string
+	ObsBucket      string
+	ObsLfsPath     string
+	StorageSize    int
+	RecycleSeconds int
+	Labels         map[string]string
+}
 
 func NewInference(cfg *Config) inference.Inference {
 	return inferenceImpl{
