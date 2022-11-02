@@ -20,8 +20,10 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	rpcclient "github.com/opensourceways/xihe-grpc-protocol/grpc/client"
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/evaluate"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-inference-evaluate/client"
+	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/inferenceimpl"
 )
 
@@ -109,6 +111,8 @@ func (w *Watcher) dispatcher(res v1.CodeServer) {
 	switch res.Labels["type"] {
 	case inferenceimpl.MetaNameInference:
 		w.HandleInference(res.ObjectMeta.Labels, status)
+	case evaluateimpl.MetaNameEvaluate:
+		w.HandleEvaluate(res.ObjectMeta.Labels, status)
 	}
 
 }
@@ -141,7 +145,7 @@ func (w *Watcher) HandleInference(labels map[string]string, status StatusDetail)
 
 	cli, err := rpcclient.NewInferenceClient(w.nConfig.InferenceEndpoint)
 	if err != nil {
-		logrus.Error("new rpc client error:", err.Error())
+		logrus.Error("new inference rpc client error:", err.Error())
 	}
 
 	index := inference.InferenceIndex{
@@ -156,9 +160,30 @@ func (w *Watcher) HandleInference(labels map[string]string, status StatusDetail)
 		AccessURL: status.AccessUrl,
 	}
 	if err = cli.SetInferenceInfo(&index, &info); err != nil {
-		logrus.Error("call rpc error:", err.Error())
+		logrus.Error("call inference rpc error:", err.Error())
 	}
 	logrus.Println("handle inference success")
+}
+
+func (w *Watcher) HandleEvaluate(labels map[string]string, status StatusDetail) {
+	cli, err := rpcclient.NewEvaluateClient(w.nConfig.EvaluateEndpoint)
+	if err != nil {
+		logrus.Error("new evaluate rpc client error:", err.Error())
+	}
+	index := evaluate.EvaluateIndex{
+		Id:         labels["id"],
+		User:       labels["user"],
+		ProjectId:  labels["project_id"],
+		TrainingID: labels["training_id"],
+	}
+	info := evaluate.EvaluateInfo{
+		Error:     status.ErrorMsg,
+		AccessURL: status.AccessUrl,
+	}
+	if err = cli.SetEvaluateInfo(&index, &info); err != nil {
+		logrus.Error("call evaluate rpc error:", err.Error())
+	}
+	logrus.Println("handle evaluate success")
 }
 
 func (w *Watcher) crdConfig() cache.SharedIndexInformer {

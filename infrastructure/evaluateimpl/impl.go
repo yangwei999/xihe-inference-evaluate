@@ -1,15 +1,14 @@
 package evaluateimpl
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+
 	"github.com/opensourceways/xihe-inference-evaluate/client"
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
 	"github.com/opensourceways/xihe-inference-evaluate/domain/evaluate"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 )
 
 const MetaNameEvaluate = "evaluate"
@@ -29,7 +28,7 @@ func (impl *evaluateImpl) CreateCustom(eva *domain.CustomEvaluate) error {
 	resource := client.GetResource2()
 
 	res, err := impl.GetObj(eva)
-	dr := cli.Resource(resource).Namespace("default")
+	dr := cli.Resource(resource).Namespace(client.CrdNameSpace)
 
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
 	if err != nil {
@@ -61,16 +60,11 @@ func (impl *evaluateImpl) GetObj(eva *domain.CustomEvaluate) (*unstructured.Unst
 	name := impl.geneMetaName(eva)
 	labels := impl.GeneLabels(eva)
 
-	tmpl, err := client.GetTemplate()
-	if err != nil {
-		return nil, err
-	}
-
 	var data = &client.CrdData{
 		Group:          client.CrdGroup,
 		Version:        client.CrdVersion,
 		Name:           name,
-		NameSpace:      "default",
+		NameSpace:      client.CrdNameSpace,
 		Image:          impl.cfg.Image,
 		ObsAk:          impl.cfg.OBS.AccessKey,
 		ObsSk:          impl.cfg.OBS.SecretKey,
@@ -82,16 +76,5 @@ func (impl *evaluateImpl) GetObj(eva *domain.CustomEvaluate) (*unstructured.Unst
 		RecycleSeconds: eva.SurvivalTime,
 		Labels:         labels,
 	}
-
-	buf := new(bytes.Buffer)
-	if err := tmpl.Execute(buf, data); err != nil {
-		return nil, err
-	}
-
-	obj := &unstructured.Unstructured{}
-	_, _, err = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(buf.Bytes(), nil, obj)
-	if err != nil {
-		return nil, err
-	}
-	return obj, nil
+	return client.GetObj(data)
 }

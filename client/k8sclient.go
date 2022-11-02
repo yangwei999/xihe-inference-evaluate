@@ -1,12 +1,15 @@
 package client
 
 import (
+	"bytes"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"os/user"
 
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
@@ -16,9 +19,12 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-const CrdGroup = "cs.opensourceways.com"
-const CrdVersion = "v1alpha1"
-const CrdKind = "CodeServer"
+const (
+	CrdGroup     = "cs.opensourceways.com"
+	CrdVersion   = "v1alpha1"
+	CrdKind      = "CodeServer"
+	CrdNameSpace = "default"
+)
 
 type CrdData struct {
 	Group          string
@@ -112,7 +118,7 @@ func GetResource2() schema.GroupVersionResource {
 	return mapping.Resource
 }
 
-func GetTemplate() (*template.Template, error) {
+func GetObj(data *CrdData) (*unstructured.Unstructured, error) {
 	txtStr, err := ioutil.ReadFile("./crd-resource.yaml")
 	if err != nil {
 		return nil, err
@@ -122,5 +128,16 @@ func GetTemplate() (*template.Template, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tmpl, nil
+
+	buf := new(bytes.Buffer)
+	if err = tmpl.Execute(buf, data); err != nil {
+		return nil, err
+	}
+
+	obj := &unstructured.Unstructured{}
+	_, _, err = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode(buf.Bytes(), nil, obj)
+	if err != nil {
+		return nil, err
+	}
+	return obj, nil
 }
