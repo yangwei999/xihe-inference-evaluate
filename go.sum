@@ -270,6 +270,8 @@ github.com/opensourceways/community-robot-lib v0.0.0-20221016001453-0602b5e39d95
 github.com/opensourceways/go-gitee v0.0.0-20220714075315-cb246f1dfb96/go.mod h1:yvVsEMhp7frMblzN1sco4C7cRlnlpqkkn3O2JQNdRu0=
 github.com/opensourceways/xihe-grpc-protocol v0.0.0-20221101013131-029e168a8328 h1:+1WTeRIic6/jGgYop8VLAkrWTn4FcDtYqgDIA3Xqf4k=
 github.com/opensourceways/xihe-grpc-protocol v0.0.0-20221101013131-029e168a8328/go.mod h1:oDg3IkriEaMnfzSah7fscVp8nq7+baTNPelKPgHSrqY=
+github.com/opensourceways/xihe-grpc-protocol v0.0.0-20221101123717-861bb4a4b5bb h1:2+N099hC2N362NrKaWmlx4X4BqJFsUkA/L+oyILhe2E=
+github.com/opensourceways/xihe-grpc-protocol v0.0.0-20221101123717-861bb4a4b5bb/go.mod h1:oDg3IkriEaMnfzSah7fscVp8nq7+baTNPelKPgHSrqY=
 github.com/otiai10/copy v1.7.0/go.mod h1:rmRl6QPdJj6EiUqXQ/4Nn2lLXoNQjFCQbbNrxgc/t3U=
 github.com/otiai10/curr v0.0.0-20150429015615-9b4961190c95/go.mod h1:9qAhocn7zKJG+0mI8eUu6xqkFDYS2kb2saOteoSB3cE=
 github.com/otiai10/curr v1.0.0/go.mod h1:LskTG5wDwr8Rs+nNQ+1LlxRjAtTZZjtJW4rMXl6j4vs=

@@ -1,6 +1,8 @@
 package client
 
 import (
+	"html/template"
+	"io/ioutil"
 	"log"
 	"os/user"
 
@@ -17,6 +19,28 @@ import (
 const CrdGroup = "cs.opensourceways.com"
 const CrdVersion = "v1alpha1"
 const CrdKind = "CodeServer"
+
+type CrdData struct {
+	Group          string
+	Version        string
+	Name           string
+	NameSpace      string
+	Image          string
+	GitlabEndPoint string
+	XiheUser       string
+	XiheUserToken  string
+	ProjectName    string
+	LastCommit     string
+	ObsAk          string
+	ObsSk          string
+	ObsEndPoint    string
+	ObsUtilPath    string
+	ObsBucket      string
+	ObsLfsPath     string
+	StorageSize    int
+	RecycleSeconds int
+	Labels         map[string]string
+}
 
 var (
 	k8sConfig *rest.Config
@@ -86,4 +110,17 @@ func GetResource2() schema.GroupVersionResource {
 	}
 	mapping, _ := GetrestMapper().RESTMapping(k.GroupKind(), k.Version)
 	return mapping.Resource
+}
+
+func GetTemplate() (*template.Template, error) {
+	txtStr, err := ioutil.ReadFile("./crd-resource.yaml")
+	if err != nil {
+		return nil, err
+	}
+
+	tmpl, err := template.New("crd").Parse(string(txtStr))
+	if err != nil {
+		return nil, err
+	}
+	return tmpl, nil
 }

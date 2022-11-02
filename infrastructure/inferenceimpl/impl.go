@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"html/template"
-	"io/ioutil"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
@@ -17,28 +14,6 @@ import (
 )
 
 const MetaNameInference = "inference"
-
-type CrdData struct {
-	Group          string
-	Version        string
-	Name           string
-	NameSpace      string
-	Image          string
-	GitlabEndPoint string
-	XiheUser       string
-	XiheUserToken  string
-	ProjectName    string
-	LastCommit     string
-	ObsAk          string
-	ObsSk          string
-	ObsEndPoint    string
-	ObsUtilPath    string
-	ObsBucket      string
-	ObsLfsPath     string
-	StorageSize    int
-	RecycleSeconds int
-	Labels         map[string]string
-}
 
 func NewInference(cfg *Config) inference.Inference {
 	return inferenceImpl{
@@ -54,12 +29,7 @@ func (impl inferenceImpl) Create(infer *domain.Inference) error {
 	cli := client.GetDyna()
 	resource := client.GetResource2()
 
-	res, err := impl.GetObj(impl.cfg, infer)
-
-	//res.Object["metadata"] = map[string]interface{}{
-	//	"name":   impl.geneMetaName(&infer.InferenceIndex),
-	//	"labels": impl.GeneLabels(infer),
-	//}
+	res, err := impl.GetObj(infer)
 
 	dr := cli.Resource(resource).Namespace("default")
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
@@ -105,37 +75,32 @@ func (impl inferenceImpl) GeneLabels(infer *domain.Inference) map[string]string 
 	return m
 }
 
-func (impl inferenceImpl) GetObj(cfg *Config, infer *domain.Inference) (*unstructured.Unstructured, error) {
+func (impl inferenceImpl) GetObj(infer *domain.Inference) (*unstructured.Unstructured, error) {
 	name := impl.geneMetaName(&infer.InferenceIndex)
 	labels := impl.GeneLabels(infer)
 
-	txtStr, err := ioutil.ReadFile("./crd-resource.yaml")
+	tmpl, err := client.GetTemplate()
 	if err != nil {
 		return nil, err
 	}
 
-	tmpl, err := template.New("crd").Parse(string(txtStr))
-	if err != nil {
-		return nil, err
-	}
-
-	var data = &CrdData{
+	var data = &client.CrdData{
 		Group:          client.CrdGroup,
 		Version:        client.CrdVersion,
 		Name:           name,
 		NameSpace:      "default",
-		Image:          cfg.Image,
-		GitlabEndPoint: cfg.GitlabEndpoint,
+		Image:          impl.cfg.Image,
+		GitlabEndPoint: impl.cfg.GitlabEndpoint,
 		XiheUser:       infer.User,
 		XiheUserToken:  infer.UserToken,
 		ProjectName:    infer.ProjectName.ProjectName(),
 		LastCommit:     infer.LastCommit,
-		ObsAk:          cfg.OBS.AccessKey,
-		ObsSk:          cfg.OBS.SecretKey,
-		ObsEndPoint:    cfg.OBS.Endpoint,
-		ObsUtilPath:    cfg.OBS.OBSUtilPath,
-		ObsBucket:      cfg.OBS.Bucket,
-		ObsLfsPath:     cfg.OBS.LFSPath,
+		ObsAk:          impl.cfg.OBS.AccessKey,
+		ObsSk:          impl.cfg.OBS.SecretKey,
+		ObsEndPoint:    impl.cfg.OBS.Endpoint,
+		ObsUtilPath:    impl.cfg.OBS.OBSUtilPath,
+		ObsBucket:      impl.cfg.OBS.Bucket,
+		ObsLfsPath:     impl.cfg.OBS.LFSPath,
 		StorageSize:    10,
 		RecycleSeconds: infer.SurvivalTime,
 		Labels:         labels,
