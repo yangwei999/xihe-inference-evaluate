@@ -86,12 +86,12 @@ func (w *Watcher) Update(oldObj, newObj interface{}) {
 
 	bys, err := json.Marshal(newObj)
 	if err != nil {
-		logrus.Error("update marshal error:", err.Error())
+		logrus.Errorf("update marshal error:%s", err.Error())
 		return
 	}
 	err = json.Unmarshal(bys, &res)
 	if err != nil {
-		logrus.Error("update unmarshal error:", err.Error())
+		logrus.Errorf("update unmarshal error:%s", err.Error())
 		return
 	}
 
@@ -99,18 +99,11 @@ func (w *Watcher) Update(oldObj, newObj interface{}) {
 }
 
 func (w *Watcher) dispatcher(res v1.CodeServer) {
-	defer func() {
-		if err := recover(); err != nil {
-			logrus.Panic("dispatcher panic:", err)
-		}
-	}()
-
 	status := w.transferStatus(res)
 	switch res.Labels["type"] {
 	case inferenceimpl.MetaNameInference:
 		w.HandleInference(res.ObjectMeta.Labels, status)
 	}
-
 }
 
 func (w *Watcher) transferStatus(res v1.CodeServer) (status StatusDetail) {
@@ -141,7 +134,7 @@ func (w *Watcher) HandleInference(labels map[string]string, status StatusDetail)
 
 	cli, err := rpcclient.NewInferenceClient(w.nConfig.InferenceEndpoint)
 	if err != nil {
-		logrus.Error("new rpc client error:", err.Error())
+		logrus.Errorf("new rpc client error:%s", err.Error())
 	}
 
 	index := inference.InferenceIndex{
@@ -156,9 +149,8 @@ func (w *Watcher) HandleInference(labels map[string]string, status StatusDetail)
 		AccessURL: status.AccessUrl,
 	}
 	if err = cli.SetInferenceInfo(&index, &info); err != nil {
-		logrus.Error("call rpc error:", err.Error())
+		logrus.Errorf("call rpc error:%s", err.Error())
 	}
-	logrus.Println("handle inference success")
 }
 
 func (w *Watcher) crdConfig() cache.SharedIndexInformer {

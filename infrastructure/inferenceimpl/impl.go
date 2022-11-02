@@ -56,11 +56,6 @@ func (impl inferenceImpl) Create(infer *domain.Inference) error {
 
 	res, err := impl.GetObj(impl.cfg, infer)
 
-	//res.Object["metadata"] = map[string]interface{}{
-	//	"name":   impl.geneMetaName(&infer.InferenceIndex),
-	//	"labels": impl.GeneLabels(infer),
-	//}
-
 	dr := cli.Resource(resource).Namespace("default")
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
 	if err != nil {
@@ -126,7 +121,7 @@ func (impl inferenceImpl) GetObj(cfg *Config, infer *domain.Inference) (*unstruc
 		NameSpace:      "default",
 		Image:          cfg.Image,
 		GitlabEndPoint: cfg.GitlabEndpoint,
-		XiheUser:       infer.User,
+		XiheUser:       infer.Project.Owner.Account(),
 		XiheUserToken:  infer.UserToken,
 		ProjectName:    infer.ProjectName.ProjectName(),
 		LastCommit:     infer.LastCommit,
