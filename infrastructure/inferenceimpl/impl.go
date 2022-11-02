@@ -105,7 +105,7 @@ func (impl inferenceImpl) GeneLabels(infer *domain.Inference) map[string]string 
 }
 
 func (impl inferenceImpl) GetObj(cfg *Config, infer *domain.Inference) (*unstructured.Unstructured, error) {
-	txtStr, err := ioutil.ReadFile("./crd-resource.tmpl")
+	txtStr, err := ioutil.ReadFile("./crd-resource.yaml")
 	if err != nil {
 		return nil, err
 	}
