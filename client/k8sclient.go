@@ -46,6 +46,11 @@ type CrdData struct {
 	StorageSize    int
 	RecycleSeconds int
 	Labels         map[string]string
+	OBSPath        string
+	EvaluateType   string
+	LearningScope  string
+	BatchScope     string
+	MomentumScope  string
 }
 
 var (
@@ -119,7 +124,7 @@ func GetResource2() schema.GroupVersionResource {
 }
 
 func GetObj(data *CrdData) (*unstructured.Unstructured, error) {
-	txtStr, err := ioutil.ReadFile("./crd-resource.yaml")
+	txtStr, err := ioutil.ReadFile("./template/crd-resource.yaml")
 	if err != nil {
 		return nil, err
 	}

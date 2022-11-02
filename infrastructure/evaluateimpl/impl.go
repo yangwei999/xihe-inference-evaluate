@@ -23,11 +23,11 @@ type evaluateImpl struct {
 	cfg *Config
 }
 
-func (impl *evaluateImpl) CreateCustom(eva *domain.CustomEvaluate) error {
+func (impl *evaluateImpl) CreateCustom(ceva *domain.CustomEvaluate) error {
 	cli := client.GetDyna()
 	resource := client.GetResource2()
 
-	res, err := impl.GetObj(eva)
+	res, err := impl.GetCustomObj(ceva)
 	dr := cli.Resource(resource).Namespace(client.CrdNameSpace)
 
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
@@ -36,17 +36,25 @@ func (impl *evaluateImpl) CreateCustom(eva *domain.CustomEvaluate) error {
 	}
 	return nil
 }
-func (impl *evaluateImpl) CreateStandard(*domain.StandardEvaluate) error {
+func (impl *evaluateImpl) CreateStandard(seva *domain.StandardEvaluate) error {
+	cli := client.GetDyna()
+	resource := client.GetResource2()
 
+	res, err := impl.GetStandardObj(seva)
+	dr := cli.Resource(resource).Namespace(client.CrdNameSpace)
+
+	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
 	return nil
-
 }
 
-func (impl *evaluateImpl) geneMetaName(eva *domain.CustomEvaluate) string {
+func (impl *evaluateImpl) geneMetaName(eva *domain.EvaluateIndex) string {
 	return fmt.Sprintf("%s-%s", MetaNameEvaluate, eva.Id)
 }
 
-func (impl *evaluateImpl) GeneLabels(eva *domain.CustomEvaluate) map[string]string {
+func (impl *evaluateImpl) GeneLabels(eva *domain.EvaluateIndex) map[string]string {
 	m := make(map[string]string)
 	m["id"] = eva.Id
 	m["user"] = eva.Project.Owner.Account()
@@ -56,9 +64,9 @@ func (impl *evaluateImpl) GeneLabels(eva *domain.CustomEvaluate) map[string]stri
 	return m
 }
 
-func (impl *evaluateImpl) GetObj(eva *domain.CustomEvaluate) (*unstructured.Unstructured, error) {
-	name := impl.geneMetaName(eva)
-	labels := impl.GeneLabels(eva)
+func (impl *evaluateImpl) GetCustomObj(ceva *domain.CustomEvaluate) (*unstructured.Unstructured, error) {
+	name := impl.geneMetaName(&ceva.EvaluateIndex)
+	labels := impl.GeneLabels(&ceva.EvaluateIndex)
 
 	var data = &client.CrdData{
 		Group:          client.CrdGroup,
@@ -73,8 +81,38 @@ func (impl *evaluateImpl) GetObj(eva *domain.CustomEvaluate) (*unstructured.Unst
 		ObsBucket:      impl.cfg.OBS.Bucket,
 		ObsLfsPath:     impl.cfg.OBS.LFSPath,
 		StorageSize:    10,
-		RecycleSeconds: eva.SurvivalTime,
+		RecycleSeconds: ceva.SurvivalTime,
 		Labels:         labels,
+		OBSPath:        ceva.AimPath,
+		EvaluateType:   ceva.Type(),
+	}
+	return client.GetObj(data)
+}
+
+func (impl *evaluateImpl) GetStandardObj(seva *domain.StandardEvaluate) (*unstructured.Unstructured, error) {
+	name := impl.geneMetaName(&seva.EvaluateIndex)
+	labels := impl.GeneLabels(&seva.EvaluateIndex)
+
+	var data = &client.CrdData{
+		Group:          client.CrdGroup,
+		Version:        client.CrdVersion,
+		Name:           name,
+		NameSpace:      client.CrdNameSpace,
+		Image:          impl.cfg.Image,
+		ObsAk:          impl.cfg.OBS.AccessKey,
+		ObsSk:          impl.cfg.OBS.SecretKey,
+		ObsEndPoint:    impl.cfg.OBS.Endpoint,
+		ObsUtilPath:    impl.cfg.OBS.OBSUtilPath,
+		ObsBucket:      impl.cfg.OBS.Bucket,
+		ObsLfsPath:     impl.cfg.OBS.LFSPath,
+		StorageSize:    10,
+		RecycleSeconds: seva.SurvivalTime,
+		Labels:         labels,
+		OBSPath:        seva.LogPath,
+		EvaluateType:   seva.Type(),
+		LearningScope:  seva.LearningRateScope.String(),
+		BatchScope:     seva.BatchSizeScope.String(),
+		MomentumScope:  seva.MomentumScope.String(),
 	}
 	return client.GetObj(data)
 }
