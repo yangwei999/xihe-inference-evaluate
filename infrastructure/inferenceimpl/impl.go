@@ -79,7 +79,7 @@ func (impl inferenceImpl) ExtendSurvivalTime(infer *domain.InferenceIndex, timeT
 
 	if sp, ok := get.Object["spec"]; ok {
 		if spc, ok := sp.(map[string]interface{}); ok {
-			spc["add"] = true
+			spc["increaseRecycleSeconds"] = true
 			spc["recycleAfterSeconds"] = timeToExtend
 		}
 	}
