@@ -37,6 +37,7 @@ type CrdData struct {
 	ObsLfsPath     string
 	StorageSize    int
 	RecycleSeconds int
+	Labels         map[string]string
 }
 
 func NewInference(cfg *Config) inference.Inference {
@@ -55,10 +56,10 @@ func (impl inferenceImpl) Create(infer *domain.Inference) error {
 
 	res, err := impl.GetObj(impl.cfg, infer)
 
-	res.Object["metadata"] = map[string]interface{}{
-		"name":   impl.geneMetaName(&infer.InferenceIndex),
-		"labels": impl.GeneLabels(infer),
-	}
+	//res.Object["metadata"] = map[string]interface{}{
+	//	"name":   impl.geneMetaName(&infer.InferenceIndex),
+	//	"labels": impl.GeneLabels(infer),
+	//}
 
 	dr := cli.Resource(resource).Namespace("default")
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
@@ -105,6 +106,9 @@ func (impl inferenceImpl) GeneLabels(infer *domain.Inference) map[string]string 
 }
 
 func (impl inferenceImpl) GetObj(cfg *Config, infer *domain.Inference) (*unstructured.Unstructured, error) {
+	name := impl.geneMetaName(&infer.InferenceIndex)
+	labels := impl.GeneLabels(infer)
+
 	txtStr, err := ioutil.ReadFile("./crd-resource.yaml")
 	if err != nil {
 		return nil, err
@@ -118,7 +122,7 @@ func (impl inferenceImpl) GetObj(cfg *Config, infer *domain.Inference) (*unstruc
 	var data = &CrdData{
 		Group:          client.CrdGroup,
 		Version:        client.CrdVersion,
-		Name:           "",
+		Name:           name,
 		NameSpace:      "default",
 		Image:          cfg.Image,
 		GitlabEndPoint: cfg.GitlabEndpoint,
@@ -134,6 +138,7 @@ func (impl inferenceImpl) GetObj(cfg *Config, infer *domain.Inference) (*unstruc
 		ObsLfsPath:     cfg.OBS.LFSPath,
 		StorageSize:    10,
 		RecycleSeconds: infer.SurvivalTime,
+		Labels:         labels,
 	}
 
 	buf := new(bytes.Buffer)

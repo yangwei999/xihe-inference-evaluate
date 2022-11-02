@@ -3,6 +3,10 @@ kind: CodeServer
 metadata:
   name: {{.Name}}
   namespace: {{.NameSpace}}
+  labels:
+    {{range $key, $value := .Labels}}
+    {{$key}}: {{$value}}
+    {{end}}
 
 spec:
   runtime: generic
