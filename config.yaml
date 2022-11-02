@@ -1,0 +1,12 @@
+inference:
+  obs:
+    obsutil_path: /home
+    access_key:  sfs
+    secret_key: gdfg
+    endpoint: dgffdg
+    lfs_path: hdfh
+    bucket: dfhdh
+  gitlab_endpiont: dhdfh
+
+watch:
+  inference_endpoint: dfhdhgit
