@@ -25,10 +25,10 @@ type evaluateImpl struct {
 
 func (impl *evaluateImpl) CreateCustom(ceva *domain.CustomEvaluate) error {
 	cli := client.GetDyna()
-	resource := client.GetResource2()
+	resource := client.GetResource()
 
 	res, err := impl.GetCustomObj(ceva)
-	dr := cli.Resource(resource).Namespace(client.CrdNameSpace)
+	dr := cli.Resource(resource).Namespace(impl.cfg.CrdNamespace)
 
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
 	if err != nil {
@@ -38,10 +38,10 @@ func (impl *evaluateImpl) CreateCustom(ceva *domain.CustomEvaluate) error {
 }
 func (impl *evaluateImpl) CreateStandard(seva *domain.StandardEvaluate) error {
 	cli := client.GetDyna()
-	resource := client.GetResource2()
+	resource := client.GetResource()
 
 	res, err := impl.GetStandardObj(seva)
-	dr := cli.Resource(resource).Namespace(client.CrdNameSpace)
+	dr := cli.Resource(resource).Namespace(impl.cfg.CrdNamespace)
 
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
 	if err != nil {
@@ -69,10 +69,11 @@ func (impl *evaluateImpl) GetCustomObj(ceva *domain.CustomEvaluate) (*unstructur
 	labels := impl.GeneLabels(&ceva.EvaluateIndex)
 
 	var data = &client.CrdData{
-		Group:          client.CrdGroup,
-		Version:        client.CrdVersion,
+		Group:          client.Cfg.Group,
+		Version:        client.Cfg.Version,
+		CodeServer:     client.Cfg.Kind,
 		Name:           name,
-		NameSpace:      client.CrdNameSpace,
+		NameSpace:      impl.cfg.CrdNamespace,
 		Image:          impl.cfg.Image,
 		ObsAk:          impl.cfg.OBS.AccessKey,
 		ObsSk:          impl.cfg.OBS.SecretKey,
@@ -82,6 +83,8 @@ func (impl *evaluateImpl) GetCustomObj(ceva *domain.CustomEvaluate) (*unstructur
 		ObsLfsPath:     impl.cfg.OBS.LFSPath,
 		StorageSize:    10,
 		RecycleSeconds: ceva.SurvivalTime,
+		CPU:            impl.cfg.CrdCpu,
+		Memory:         impl.cfg.CrdMemory,
 		Labels:         labels,
 		OBSPath:        ceva.AimPath,
 		EvaluateType:   ceva.Type(),
@@ -94,10 +97,11 @@ func (impl *evaluateImpl) GetStandardObj(seva *domain.StandardEvaluate) (*unstru
 	labels := impl.GeneLabels(&seva.EvaluateIndex)
 
 	var data = &client.CrdData{
-		Group:          client.CrdGroup,
-		Version:        client.CrdVersion,
+		Group:          client.Cfg.Group,
+		Version:        client.Cfg.Version,
+		CodeServer:     client.Cfg.Kind,
 		Name:           name,
-		NameSpace:      client.CrdNameSpace,
+		NameSpace:      impl.cfg.CrdNamespace,
 		Image:          impl.cfg.Image,
 		ObsAk:          impl.cfg.OBS.AccessKey,
 		ObsSk:          impl.cfg.OBS.SecretKey,
@@ -107,6 +111,8 @@ func (impl *evaluateImpl) GetStandardObj(seva *domain.StandardEvaluate) (*unstru
 		ObsLfsPath:     impl.cfg.OBS.LFSPath,
 		StorageSize:    10,
 		RecycleSeconds: seva.SurvivalTime,
+		CPU:            impl.cfg.CrdCpu,
+		Memory:         impl.cfg.CrdMemory,
 		Labels:         labels,
 		OBSPath:        seva.LogPath,
 		EvaluateType:   seva.Type(),

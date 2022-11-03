@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/opensourceways/community-robot-lib/utils"
-
+	"github.com/opensourceways/xihe-inference-evaluate/client"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/watchimpl"
@@ -38,6 +38,7 @@ type Config struct {
 	Inference inferenceimpl.Config `json:"inference"  required:"true"`
 	Evaluate  evaluateimpl.Config  `json:"evaluate"   required:"true"`
 	Watch     watchimpl.Config     `json:"watch"      required:"true"`
+	K8sClient client.Config        `json:"k8SClient"  required:"true"`
 }
 
 func (cfg *Config) configItems() []interface{} {
@@ -45,6 +46,7 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.Inference,
 		&cfg.Evaluate,
 		&cfg.Watch,
+		&cfg.K8sClient,
 	}
 }
 

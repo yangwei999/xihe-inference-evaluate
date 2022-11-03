@@ -4,8 +4,6 @@ import (
 	"flag"
 	"os"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/opensourceways/community-robot-lib/logrusutil"
 	liboptions "github.com/opensourceways/community-robot-lib/options"
 	"github.com/opensourceways/xihe-inference-evaluate/client"
@@ -13,6 +11,7 @@ import (
 	"github.com/opensourceways/xihe-inference-evaluate/controller"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/watchimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/server"
+	"github.com/sirupsen/logrus"
 )
 
 type options struct {
@@ -42,11 +41,6 @@ func main() {
 	logrusutil.ComponentInit("xihe")
 	log := logrus.NewEntry(logrus.StandardLogger())
 
-	err := client.Init()
-	if err != nil {
-		logrus.Fatalf("k8s client init, err:%s", err.Error())
-	}
-
 	o := gatherOptions(
 		flag.NewFlagSet(os.Args[0], flag.ExitOnError),
 		os.Args[1:]...,
@@ -64,6 +58,11 @@ func main() {
 	cfg := new(config.Config)
 	if err := config.LoadConfig(o.service.ConfigFile, cfg); err != nil {
 		logrus.Fatalf("load config, err:%s", err.Error())
+	}
+
+	err := client.Init(&cfg.K8sClient)
+	if err != nil {
+		logrus.Fatalf("k8s client init, err:%s", err.Error())
 	}
 
 	// controller
