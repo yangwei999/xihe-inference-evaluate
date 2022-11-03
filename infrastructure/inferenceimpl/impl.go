@@ -25,11 +25,11 @@ type inferenceImpl struct {
 
 func (impl inferenceImpl) Create(infer *domain.Inference) error {
 	cli := client.GetDyna()
-	resource := client.GetResource2()
+	resource := client.GetResource()
 
 	res, err := impl.GetObj(infer)
 
-	dr := cli.Resource(resource).Namespace(client.CrdNameSpace)
+	dr := cli.Resource(resource).Namespace(impl.cfg.CrdNamespace)
 	_, err = dr.Create(context.TODO(), res, metav1.CreateOptions{})
 	if err != nil {
 		return err
@@ -39,9 +39,9 @@ func (impl inferenceImpl) Create(infer *domain.Inference) error {
 
 func (impl inferenceImpl) ExtendSurvivalTime(infer *domain.InferenceIndex, timeToExtend int) error {
 	cli := client.GetDyna()
-	resource := client.GetResource2()
+	resource := client.GetResource()
 
-	get, err := cli.Resource(resource).Namespace(client.CrdNameSpace).Get(context.TODO(), impl.geneMetaName(infer), metav1.GetOptions{})
+	get, err := cli.Resource(resource).Namespace(impl.cfg.CrdNamespace).Get(context.TODO(), impl.geneMetaName(infer), metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (impl inferenceImpl) ExtendSurvivalTime(infer *domain.InferenceIndex, timeT
 			spc["recycleAfterSeconds"] = timeToExtend
 		}
 	}
-	_, err = cli.Resource(resource).Namespace(client.CrdNameSpace).Update(context.TODO(), get, metav1.UpdateOptions{})
+	_, err = cli.Resource(resource).Namespace(impl.cfg.CrdNamespace).Update(context.TODO(), get, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -78,10 +78,11 @@ func (impl inferenceImpl) GetObj(infer *domain.Inference) (*unstructured.Unstruc
 	labels := impl.GeneLabels(infer)
 
 	var data = &client.CrdData{
-		Group:          client.CrdGroup,
-		Version:        client.CrdVersion,
+		Group:          client.Cfg.Group,
+		Version:        client.Cfg.Version,
+		CodeServer:     client.Cfg.Kind,
 		Name:           name,
-		NameSpace:      client.CrdNameSpace,
+		NameSpace:      impl.cfg.CrdNamespace,
 		Image:          impl.cfg.Image,
 		GitlabEndPoint: impl.cfg.GitlabEndpoint,
 		XiheUser:       infer.Project.Owner.Account(),
@@ -96,6 +97,8 @@ func (impl inferenceImpl) GetObj(infer *domain.Inference) (*unstructured.Unstruc
 		ObsLfsPath:     impl.cfg.OBS.LFSPath,
 		StorageSize:    10,
 		RecycleSeconds: infer.SurvivalTime,
+		CPU:            impl.cfg.CrdCpu,
+		Memory:         impl.cfg.CrdMemory,
 		Labels:         labels,
 	}
 	return client.GetObj(data)

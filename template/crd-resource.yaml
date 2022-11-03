@@ -1,5 +1,5 @@
 apiVersion: {{.Group}}/{{.Version}}
-kind: CodeServer
+kind: {{.CodeServer}}
 metadata:
   name: {{.Name}}
   namespace: {{.NameSpace}}
@@ -19,8 +19,8 @@ spec:
   restartPolicy: Never
   resources:
     requests:
-      cpu: 0.5
-      memory: 512Mi
+      cpu: {{.CPU}}
+      memory: {{.Memory}}Mi
   connectProbe: /
   workspaceLocation: /workspace
   envs:

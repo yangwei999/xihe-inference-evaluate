@@ -2,11 +2,9 @@ package client
 
 import (
 	"bytes"
+	"github.com/sirupsen/logrus"
 	"html/template"
 	"io/ioutil"
-	"log"
-	"os/user"
-
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer/yaml"
@@ -19,16 +17,10 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-const (
-	CrdGroup     = "cs.opensourceways.com"
-	CrdVersion   = "v1alpha1"
-	CrdKind      = "CodeServer"
-	CrdNameSpace = "default"
-)
-
 type CrdData struct {
 	Group          string
 	Version        string
+	CodeServer     string
 	Name           string
 	NameSpace      string
 	Image          string
@@ -45,6 +37,8 @@ type CrdData struct {
 	ObsLfsPath     string
 	StorageSize    int
 	RecycleSeconds int
+	CPU            string
+	Memory         string
 	Labels         map[string]string
 	OBSPath        string
 	EvaluateType   string
@@ -58,42 +52,47 @@ var (
 	k8sClient *kubernetes.Clientset
 	dyna      dynamic.Interface
 	restm     *restmapper.DeferredDiscoveryRESTMapper
+	resource  schema.GroupVersionResource
+	Cfg       *Config
 )
 
-func getHome() string {
-	u, err := user.Current()
+func Init(cfg *Config) (err error) {
+	Cfg = cfg
+	k8sConfig, err = clientcmd.BuildConfigFromFlags("", cfg.KubeConfigFile)
 	if err != nil {
-		return ""
-	}
-
-	return u.HomeDir
-}
-
-func Init() (err error) {
-	k8sConfig, err = clientcmd.BuildConfigFromFlags("", getHome()+"/.kube/config")
-	if err != nil {
-		log.Println(err)
+		logrus.Error(err)
 		return
 	}
 
 	k8sClient, err = kubernetes.NewForConfig(k8sConfig)
 	if err != nil {
-		log.Println(err)
+		logrus.Error(err)
 		return
 	}
 	dyna, err = dynamic.NewForConfig(k8sConfig)
 	if err != nil {
-		log.Println(err)
+		logrus.Error(err)
 		return
 	}
 
 	dis, err := discovery.NewDiscoveryClientForConfig(k8sConfig)
 	if err != nil {
-		log.Println("NewDiscoveryClientForConfig err", err)
+		logrus.Errorf("NewDiscoveryClientForConfig err:%s", err)
 		return
 	}
 
 	restm = restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(dis))
+
+	k := schema.GroupVersionKind{
+		Group:   cfg.Group,
+		Version: cfg.Version,
+		Kind:    cfg.Kind,
+	}
+	mapping, err := GetrestMapper().RESTMapping(k.GroupKind(), k.Version)
+	if err != nil {
+		logrus.Errorf("init resource err:%s", err)
+	}
+	resource = mapping.Resource
 	return nil
 }
 
@@ -113,14 +112,8 @@ func GetK8sConfig() *rest.Config {
 	return k8sConfig
 }
 
-func GetResource2() schema.GroupVersionResource {
-	k := schema.GroupVersionKind{
-		Group:   CrdGroup,
-		Version: CrdVersion,
-		Kind:    CrdKind,
-	}
-	mapping, _ := GetrestMapper().RESTMapping(k.GroupKind(), k.Version)
-	return mapping.Resource
+func GetResource() schema.GroupVersionResource {
+	return resource
 }
 
 func GetObj(data *CrdData) (*unstructured.Unstructured, error) {
