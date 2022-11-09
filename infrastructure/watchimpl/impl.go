@@ -84,7 +84,7 @@ func (w *Watcher) Run() {
 func (w *Watcher) update(oldObj, newObj interface{}) {
 	res, ok := newObj.(v1.CodeServer)
 	if !ok {
-		logrus.Errorf("arrert err: %v", newObj)
+		logrus.Debugf("assert err: %v", newObj)
 
 		return
 	}
