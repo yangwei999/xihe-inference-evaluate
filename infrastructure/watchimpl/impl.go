@@ -15,7 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
-	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
@@ -23,23 +22,15 @@ import (
 	"github.com/opensourceways/xihe-inference-evaluate/k8sclient"
 )
 
-var serverUnusable = map[v1.ServerConditionType]struct{}{
-	v1.ServerRecycled: {},
-	v1.ServerInactive: {},
-	v1.ServerErrored:  {},
-}
-
-var serverUsable = map[v1.ServerConditionType]struct{}{
-	v1.ServerReady: {},
-}
-
 type Watcher struct {
+	cli             *k8sclient.Client
 	evaluateClient  *rpcclient.EvaluateClient
 	inferenceClient *rpcclient.InferenceClient
 
-	handles  map[string]func(map[string]string, statusDetail)
-	resource dynamic.NamespaceableResourceInterface
-	stopCh   chan struct{}
+	podNamePrifixes []string
+	handles         map[string]func(map[string]string, statusDetail)
+	stop            chan struct{}
+	stopped         chan struct{}
 }
 
 type statusDetail struct {
@@ -47,7 +38,7 @@ type statusDetail struct {
 	errorMsg  string
 }
 
-func NewWatcher(cfg *Config) (*Watcher, error) {
+func NewWatcher(cli *k8sclient.Client, cfg *Config) (*Watcher, error) {
 	evaluateClient, err := rpcclient.NewEvaluateClient(cfg.EvaluateEndpoint)
 	if err != nil {
 		return nil, fmt.Errorf("new evaluate rpc client error: %s", err.Error())
@@ -59,9 +50,15 @@ func NewWatcher(cfg *Config) (*Watcher, error) {
 	}
 
 	w := &Watcher{
-		resource:        k8sclient.GetResource(),
+		cli:             cli,
+		stop:            make(chan struct{}),
+		stopped:         make(chan struct{}),
 		evaluateClient:  evaluateClient,
 		inferenceClient: inferenceClient,
+		podNamePrifixes: []string{
+			inferenceimpl.MetaName(),
+			evaluateimpl.MetaName(),
+		},
 	}
 
 	w.handles = map[string]func(map[string]string, statusDetail){
@@ -74,20 +71,28 @@ func NewWatcher(cfg *Config) (*Watcher, error) {
 
 func (w *Watcher) Run() {
 	infor := w.crdConfig()
+
 	infor.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		UpdateFunc: w.update,
 	})
 
-	w.stopCh = make(chan struct{})
+	infor.Run(w.stop)
 
-	infor.Run(w.stopCh)
-
-	if !cache.WaitForCacheSync(w.stopCh, infor.HasSynced) {
+	if !cache.WaitForCacheSync(w.stop, infor.HasSynced) {
 		logrus.Fatalln("cache sync err")
+
 		return
 	}
 
-	<-w.stopCh
+	w.watchPod()
+
+	close(w.stopped)
+}
+
+func (w *Watcher) Exit() {
+	close(w.stop)
+
+	<-w.stopped
 }
 
 func (w *Watcher) update(oldObj, newObj interface{}) {
@@ -106,43 +111,51 @@ func (w *Watcher) update(oldObj, newObj interface{}) {
 		return
 	}
 
-	h, ok := w.handles[res.Labels["type"]]
+	go w.watchCRD(res)
+}
+
+func (w *Watcher) watchCRD(res v1.CodeServer) {
+	h, ok := w.handles[res.Labels[labelType]]
 	if !ok {
 		return
 	}
 
-	go h(res.ObjectMeta.Labels, w.transferStatus(res))
-}
+	recycled, endPoint := w.checkCRDStatus(&res)
 
-func (w *Watcher) transferStatus(res v1.CodeServer) (status statusDetail) {
-	var endPoint string
-
-	for _, condition := range res.Status.Conditions {
-		if _, ok := serverUnusable[condition.Type]; ok {
-			if condition.Status == corev1.ConditionTrue {
-				status.errorMsg = condition.Reason
-				if msg, ok := condition.Message["detail"]; ok && len(msg) != 0 {
-					status.errorMsg = msg
-				}
-
-				return
-			}
+	if recycled {
+		if err := w.cli.DeleteCRD(res.GetName()); err != nil {
+			logrus.Errorf("watch delete crd(%s) err: %s", res.GetName(), err.Error())
 		}
 
-		if _, ok := serverUsable[condition.Type]; ok {
-			if condition.Status == corev1.ConditionFalse {
-				status.errorMsg = condition.Reason
-
-				return
-			}
-		}
-
-		if endPoint == "" {
-			endPoint = condition.Message["instanceEndpoint"]
-		}
+		return
 	}
 
-	status.accessUrl = endPoint
+	if endPoint != "" {
+		h(res.ObjectMeta.Labels, statusDetail{accessUrl: endPoint})
+	}
+}
+
+func (w *Watcher) checkCRDStatus(res *v1.CodeServer) (recycled bool, endPoint string) {
+	v := res.Status.Conditions
+	for i := range v {
+		item := &v[i]
+
+		switch item.Type {
+		case v1.ServerRecycled:
+			if item.Status == corev1.ConditionTrue {
+				recycled = true
+
+				break
+			}
+
+		case v1.ServerReady:
+			if item.Status == corev1.ConditionTrue {
+				endPoint = item.Message["instanceEndpoint"]
+
+				break
+			}
+		}
+	}
 
 	return
 }
@@ -201,18 +214,15 @@ func (w *Watcher) crdConfig() cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return w.resource.List(context.TODO(), options)
+				return w.cli.GetResource().List(context.TODO(), options)
 			},
+
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return w.resource.Watch(context.TODO(), options)
+				return w.cli.GetResource().Watch(context.TODO(), options)
 			},
 		},
 		&unstructured.Unstructured{},
 		0,
 		cache.Indexers{},
 	)
-}
-
-func (w *Watcher) Exit() {
-	close(w.stopCh)
 }

@@ -1,29 +1,30 @@
 package k8sclient
 
 import (
+	"bytes"
+	"context"
+	"io"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-var (
-	k8sConfig *rest.Config
-	k8sClient *kubernetes.Clientset
-	resource  dynamic.NamespaceableResourceInterface
-)
-
-func Init(cfg *Config) (err error) {
-	k8sConfig, err = clientcmd.BuildConfigFromFlags("", cfg.KubeConfigFile)
+func Init(cfg *Config) (cli Client, err error) {
+	k8sConfig, err := clientcmd.BuildConfigFromFlags("", cfg.KubeConfigFile)
 	if err != nil {
 		return
 	}
 
-	k8sClient, err = kubernetes.NewForConfig(k8sConfig)
+	cli.k8sClient, err = kubernetes.NewForConfig(k8sConfig)
 	if err != nil {
 		return
 	}
@@ -51,19 +52,75 @@ func Init(cfg *Config) (err error) {
 		return
 	}
 
-	resource = dyna.Resource(mapping.Resource)
+	cli.podCli = cli.k8sClient.CoreV1().Pods(cfg.Namespace)
+	cli.resource = dyna.Resource(mapping.Resource)
+	cli.resourceCli = cli.resource.Namespace(cfg.Namespace)
 
 	return
 }
 
-func GetClient() *kubernetes.Clientset {
-	return k8sClient
+type Client struct {
+	k8sClient   *kubernetes.Clientset
+	resource    dynamic.NamespaceableResourceInterface
+	resourceCli dynamic.ResourceInterface
+	podCli      typedcorev1.PodInterface
 }
 
-func GetResource() dynamic.NamespaceableResourceInterface {
-	return resource
+func (cli *Client) GetResource() dynamic.NamespaceableResourceInterface {
+	return cli.resource
 }
 
-func GetNamespace(ns string) dynamic.ResourceInterface {
-	return resource.Namespace(ns)
+func (cli *Client) CreateCRD(res *unstructured.Unstructured) error {
+	_, err := cli.resourceCli.Create(context.TODO(), res, metav1.CreateOptions{})
+
+	return err
+}
+
+func (cli *Client) UpdateCRD(res *unstructured.Unstructured) error {
+	_, err := cli.resourceCli.Update(context.TODO(), res, metav1.UpdateOptions{})
+
+	return err
+}
+
+func (cli *Client) GetCRD(name string) (*unstructured.Unstructured, error) {
+	return cli.resourceCli.Get(context.TODO(), name, metav1.GetOptions{})
+}
+
+func (cli *Client) DeleteCRD(name string) error {
+	return cli.resourceCli.Delete(context.TODO(), name, metav1.DeleteOptions{})
+}
+
+func (cli *Client) ListPods() ([]corev1.Pod, error) {
+	v, err := cli.podCli.List(
+		context.TODO(), metav1.ListOptions{LabelSelector: "app=codeserver"},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return v.Items, nil
+}
+
+func (cli *Client) FailedPodLog(pod *corev1.Pod, buf *bytes.Buffer) error {
+	v := cli.podCli.GetLogs(pod.GetName(), &corev1.PodLogOptions{Previous: true})
+
+	s, err := v.Stream(context.TODO())
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(buf, s)
+
+	return err
+}
+
+func (cli *Client) IsPodFailed(pod *corev1.Pod) bool {
+	v := pod.Status.ContainerStatuses
+	for i := range v {
+		if v[i].RestartCount > 0 {
+			return true
+		}
+	}
+
+	return false
 }
