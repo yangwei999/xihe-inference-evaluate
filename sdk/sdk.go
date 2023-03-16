@@ -18,6 +18,8 @@ type InferenceUpdateOption = controller.InferenceUpdateRequest
 type CustomEvaluateCreateOption = controller.CustomEvaluateCreateRequest
 type StandardEvaluateCreateOption = controller.StandardEvaluateCreateRequest
 
+type CloudPodCreateOption = controller.CloudPodCreateRequest
+
 func NewInferenceEvaluate(endpoint string) InferenceEvaluate {
 	return InferenceEvaluate{
 		endpoint: strings.TrimSuffix(endpoint, "/"),
@@ -92,6 +94,28 @@ func (t InferenceEvaluate) CreateStandardEvaluate(opt *StandardEvaluateCreateOpt
 
 	req, err := http.NewRequest(
 		http.MethodPost, t.evaluateURL()+"/"+domain.EvaluateTypeStandard,
+		bytes.NewBuffer(payload),
+	)
+	if err != nil {
+		return err
+	}
+
+	return t.forwardTo(req, nil)
+}
+
+// cloud
+func (t InferenceEvaluate) cloudPodURL() string {
+	return fmt.Sprintf("%s/api/v1/cloud", t.endpoint)
+}
+
+func (t InferenceEvaluate) CreateCloudPod(opt *CloudPodCreateOption) error {
+	payload, err := utils.JsonMarshal(&opt)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(
+		http.MethodPost, t.cloudPodURL(),
 		bytes.NewBuffer(payload),
 	)
 	if err != nil {

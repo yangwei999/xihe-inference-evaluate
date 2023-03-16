@@ -15,6 +15,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
+	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/cloudimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/k8sclient"
@@ -45,6 +46,7 @@ func NewWatcher(
 		podNamePrifixes: []string{
 			inferenceimpl.MetaName(),
 			evaluateimpl.MetaName(),
+			cloudimpl.MetaName(),
 		},
 	}
 }

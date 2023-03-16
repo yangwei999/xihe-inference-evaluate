@@ -11,6 +11,7 @@ import (
 	"github.com/opensourceways/xihe-inference-evaluate/config"
 	"github.com/opensourceways/xihe-inference-evaluate/controller"
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
+	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/cloudimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/watchimpl"
@@ -81,6 +82,12 @@ func main() {
 		logrus.Fatalf("new inference service failed, err:%s", err.Error())
 	}
 
+	// cloud
+	cloud, err := cloudimpl.NewCloud(&cli, &cfg.Cloud, cfg.K8sClient)
+	if err != nil {
+		logrus.Fatalf("new cloud service failed, err:%s", err.Error())
+	}
+
 	// controller
 	controller.Init(log)
 
@@ -90,6 +97,7 @@ func main() {
 		map[string]func(map[string]string, domain.ContainerDetail){
 			inferenceimpl.MetaName(): inference.NotifyResult,
 			evaluateimpl.MetaName():  evaluate.NotifyResult,
+			cloudimpl.MetaName():     cloud.NotifyResult,
 		},
 	)
 
@@ -102,6 +110,7 @@ func main() {
 		&server.Service{
 			Evaluate:  evaluate,
 			Inference: inference,
+			Cloud:     cloud,
 		},
 	)
 }
