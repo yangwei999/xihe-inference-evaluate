@@ -11,8 +11,9 @@ type configSetDefault interface {
 }
 
 type Config struct {
-	CRD         config.CRDConfig `json:"crd"              required:"true"`
-	RPCEndpoint string           `json:"rpc_endpiont"     required:"true"`
+	CRD          config.CRDConfig `json:"crd"              required:"true"`
+	RPCEndpoint  string           `json:"rpc_endpiont"     required:"true"`
+	JupyterToken string           `json:"jupyter_token"    required:"true"`
 }
 
 func (cfg *Config) configItems() []interface{} {
