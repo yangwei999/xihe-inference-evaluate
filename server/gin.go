@@ -14,6 +14,7 @@ import (
 	"github.com/opensourceways/xihe-inference-evaluate/config"
 	"github.com/opensourceways/xihe-inference-evaluate/controller"
 	"github.com/opensourceways/xihe-inference-evaluate/docs"
+	"github.com/opensourceways/xihe-inference-evaluate/domain/cloud"
 	"github.com/opensourceways/xihe-inference-evaluate/domain/evaluate"
 	"github.com/opensourceways/xihe-inference-evaluate/domain/inference"
 )
@@ -21,6 +22,7 @@ import (
 type Service struct {
 	Evaluate  evaluate.Evaluate
 	Inference inference.Inference
+	Cloud     cloud.Cloud
 }
 
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config, s *Service) {
@@ -52,6 +54,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config, s *Service) {
 		)
 		controller.AddRouterForEvaluateController(
 			v1, s.Evaluate,
+		)
+
+		controller.AddRouterForCloudController(
+			v1, s.Cloud,
 		)
 
 	}

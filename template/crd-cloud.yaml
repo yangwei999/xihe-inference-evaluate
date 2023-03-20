@@ -1,0 +1,31 @@
+apiVersion: {{.Group}}/{{.Version}}
+kind: {{.CodeServer}}
+metadata:
+  name: {{.Name}}
+  namespace: {{.NameSpace}}
+  labels:
+      {{range $key, $value := .Labels}}
+        {{$key}}: {{$value}}
+        {{end}}
+
+spec:
+  runtime: generic
+  subdomain: {{.Name}}
+  image: {{.Image}}
+  storageSize: {{.StorageSize}}Gi
+  storageName: emptyDir
+  inactiveAfterSeconds: 0
+  recycleAfterSeconds: {{.RecycleSeconds}}
+  restartPolicy: Never
+  resources:
+    requests:
+      cpu: "{{.CPU}}"
+      memory: {{.Memory}}
+  connectProbe: /
+  workspaceLocation: /workspace
+  containerPort: "{{.ContainerPort}}"
+  envs:
+    - name: JUPYTER_SERVER_PORT
+      value: "{{.ContainerPort}}"
+    - name: JUPYTER_SERVER_NAME
+      value: "0.0.0.0"
