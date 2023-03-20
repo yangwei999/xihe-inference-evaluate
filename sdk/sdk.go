@@ -105,7 +105,7 @@ func (t InferenceEvaluate) CreateStandardEvaluate(opt *StandardEvaluateCreateOpt
 
 // cloud
 func (t InferenceEvaluate) cloudPodURL() string {
-	return fmt.Sprintf("%s/api/v1/cloud", t.endpoint)
+	return fmt.Sprintf("%s/api/v1/cloud/pod", t.endpoint)
 }
 
 func (t InferenceEvaluate) CreateCloudPod(opt *CloudPodCreateOption) error {
