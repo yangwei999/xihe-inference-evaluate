@@ -111,7 +111,7 @@ func (impl *cloudImpl) NotifyResult(labels map[string]string, status domain.Cont
 
 	info := rpccloud.PodInfo{
 		Error:     status.ErrorMsg,
-		AccessURL: status.AccessUrl,
+		AccessURL: fmt.Sprintf("%s?token=%s", status.AccessUrl, impl.cfg.JupyterToken),
 	}
 
 	if err := impl.rpcCli.SetPodInfo(&cloud, &info); err != nil {
