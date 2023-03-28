@@ -17,8 +17,13 @@ spec:
   inactiveAfterSeconds: 0
   recycleAfterSeconds: {{.RecycleSeconds}}
   restartPolicy: Never
+  nodeSelector:
+    jupyter: "true"
   resources:
     requests:
+      cpu: "{{.CPU}}"
+      memory: {{.Memory}}
+    limits:
       cpu: "{{.CPU}}"
       memory: {{.Memory}}
   connectProbe: /
