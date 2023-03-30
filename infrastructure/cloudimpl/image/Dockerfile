@@ -45,6 +45,7 @@ RUN echo "figlet MindSpore" >> ~/.bashrc \
     && echo "alias ll='ls -l'" >> ~/.bashrc
 
 # 安装常用库
+RUN python -m pip install --upgrade pip
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ pandas numpy matplotlib tqdm scikit-learn ipywidgets ipympl
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ mindspore mindvision
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ tinyms
