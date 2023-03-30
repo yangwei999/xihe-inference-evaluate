@@ -5,6 +5,7 @@ jupyterlab_code_formatter
 python-language-server[all]
 jupyterlab-git
 jupyterlab-system-monitor 
+mindvision
 black 
 isort
 pandas
