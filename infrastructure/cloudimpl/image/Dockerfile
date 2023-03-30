@@ -30,27 +30,15 @@ ENV PWD=/home/mindspore
 USER $NB_UID
 
 # 安装依赖
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ jupyterlab==3.6.1
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ jupyterlab-language-pack-zh-CN \
-    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ jupyterlab-lsp \
-    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ jupyterlab_code_formatter \
-    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ python-language-server[all] \
-    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ jupyterlab-git \ 
-    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ jupyterlab-system-monitor \
-    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ black isort
+COPY --chown=mindspore:mindspore  requirements.txt  ./
+RUN pip install --upgrade -i https://pypi.mirrors.ustc.edu.cn/simple pip
+RUN pip install --default-timeout=1000 --user -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
+RUN rm requirements.txt
 
 # 原有镜像ls为ls -a --color，这里去掉-a
 RUN echo "figlet MindSpore" >> ~/.bashrc \
     && echo "alias ls='ls --color'" >> ~/.bashrc \
     && echo "alias ll='ls -l'" >> ~/.bashrc
-
-# 安装常用库
-RUN python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ pandas numpy matplotlib tqdm scikit-learn ipywidgets ipympl download 
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ mindspore mindvision
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ tinyms
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ gradio aim
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ https://obs-xihe-beijing4.obs.cn-north-4.myhuaweicloud.com/cann/mindformers/mindformers-0.3.0-py3-none-any.whl
 
 # 更改hostname，没生效，需更改/etc/hostname
 ENV HOSTNAME=xihe
