@@ -30,8 +30,8 @@ ENV PWD=/home/mindspore
 USER $NB_UID
 
 # 安装依赖
+RUN pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.10.1/MindSpore/cpu/x86_64/mindspore-1.10.1-cp39-cp39-linux_x86_64.whl --trusted-host ms-release.obs.cn-north-4.myhuaweicloud.com -i https://pypi.tuna.tsinghua.edu.cn/simple
 COPY --chown=mindspore:mindspore  requirements.txt  ./
-RUN pip install mindspore mindvision -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com
 RUN pip install --upgrade -i https://pypi.mirrors.ustc.edu.cn/simple pip
 RUN pip install --default-timeout=1200 --user -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
 RUN rm requirements.txt
