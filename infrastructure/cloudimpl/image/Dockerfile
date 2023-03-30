@@ -45,12 +45,11 @@ RUN echo "figlet MindSpore" >> ~/.bashrc \
     && echo "alias ll='ls -l'" >> ~/.bashrc
 
 # 安装常用库
-RUN python -m pip install --upgrade pip
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ pandas numpy matplotlib tqdm scikit-learn ipywidgets ipympl
+RUN python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ pandas numpy matplotlib tqdm scikit-learn ipywidgets ipympl download 
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ mindspore mindvision
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ tinyms
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ gradio aim
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ download 
 RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ https://obs-xihe-beijing4.obs.cn-north-4.myhuaweicloud.com/cann/mindformers/mindformers-0.3.0-py3-none-any.whl
 
 # 更改hostname，没生效，需更改/etc/hostname
