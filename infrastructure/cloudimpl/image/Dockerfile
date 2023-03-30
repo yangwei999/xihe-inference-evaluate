@@ -14,10 +14,10 @@ RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
     && rm -rf /var/lib/apt/lists/*
 
 # 修改原有用户
-# /home/<原有用户>用户文件夹没删除，需再分析
 RUN usermod -l mindspore -d /home/mindspore -m ${NB_USER} \
-    && groupmod -n mindspore users \
-    && sudo rm -rf /home/${NB_USER}
+    && groupmod -n mindspore users
+
+WORKDIR /home/mindspore
 
 # 更改原有镜像env
 ENV NB_USER=mindspore 
@@ -30,19 +30,20 @@ ENV PWD=/home/mindspore
 USER $NB_UID
 
 # 安装依赖
-RUN pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.10.1/MindSpore/cpu/x86_64/mindspore-1.10.1-cp39-cp39-linux_x86_64.whl --trusted-host ms-release.obs.cn-north-4.myhuaweicloud.com -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install -i https://pypi.mirrors.ustc.edu.cn/simple mindspore
+# RUN pip install https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.10.1/MindSpore/cpu/x86_64/mindspore-1.10.1-cp39-cp39-linux_x86_64.whl --trusted-host ms-release.obs.cn-north-4.myhuaweicloud.com -i https://pypi.tuna.tsinghua.edu.cn/simple
 COPY --chown=mindspore:mindspore  requirements.txt  ./
-RUN pip install --upgrade -i https://pypi.mirrors.ustc.edu.cn/simple pip
-RUN pip install --default-timeout=1200 --user -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
-RUN rm requirements.txt
+RUN pip install --upgrade -i https://pypi.mirrors.ustc.edu.cn/simple pip 
+RUN pip install --default-timeout=1200 -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
+RUN rm ./requirements.txt
 
 # 原有镜像ls为ls -a --color，这里去掉-a
 RUN echo "figlet MindSpore" >> ~/.bashrc \
     && echo "alias ls='ls --color'" >> ~/.bashrc \
     && echo "alias ll='ls -l'" >> ~/.bashrc
 
-# 更改hostname，没生效，需更改/etc/hostname
-ENV HOSTNAME=xihe
+# 更改hostname
+ENV HOSTNAME=mindspore
 
 RUN jupyter lab --generate-config
 RUN echo 'c.ServerApp.token="f9a3bd4e9f2c3be01cd629154cfb224c2703181e050254b5"' >> ~/.jupyter/jupyter_lab_config.py 
