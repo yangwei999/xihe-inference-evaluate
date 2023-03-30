@@ -4,8 +4,7 @@ jupyterlab-lsp
 jupyterlab_code_formatter
 python-language-server[all]
 jupyterlab-git
-jupyterlab-system-monitor
-mindspore 
+jupyterlab-system-monitor 
 black 
 isort
 pandas
@@ -16,7 +15,6 @@ scikit-learn
 ipywidgets
 ipympl
 download 
-mindvision
 tinyms
 gradio
 aim
