@@ -32,7 +32,7 @@ USER $NB_UID
 # 安装依赖
 COPY --chown=mindspore:mindspore  requirements.txt  ./
 RUN pip install --upgrade -i https://pypi.mirrors.ustc.edu.cn/simple pip
-RUN pip install --default-timeout=1000 --user -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
+RUN pip install --default-timeout=1200 --user -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
 RUN rm requirements.txt
 
 # 原有镜像ls为ls -a --color，这里去掉-a
