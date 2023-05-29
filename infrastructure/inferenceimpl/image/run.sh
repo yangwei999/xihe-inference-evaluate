@@ -10,7 +10,7 @@ xihe_user_token=${XIHE_USER_TOKEN}
 project_name=${PROJECT_NAME}
 last_commit=${LAST_COMMIT}
 
-repo_url=http://${xihe_user}:${xihe_user_token}@${gitlab_endpoint#"http://"}
+repo_url=https://${xihe_user}:${xihe_user_token}@${gitlab_endpoint#"https://"}
 
 obs_ak=${OBS_AK}
 obs_sk=${OBS_SK}
