@@ -17,6 +17,8 @@ spec:
   inactiveAfterSeconds: 0
   recycleAfterSeconds: {{.RecycleSeconds}}
   restartPolicy: Never
+  nodeSelector:
+    inference: "true"
   resources:
     requests:
       cpu: "{{.CPU}}"
