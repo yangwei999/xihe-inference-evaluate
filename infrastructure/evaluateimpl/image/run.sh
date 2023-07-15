@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set +o history
 set -euo pipefail
 
 export PATH=/root/.local/bin:$PATH

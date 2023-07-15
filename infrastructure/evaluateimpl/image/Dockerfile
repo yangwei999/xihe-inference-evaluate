@@ -10,6 +10,11 @@ RUN tar -xf ./obsutil.tar.gz
 # real service
 FROM python:3.9.13
 
+USER root
+RUN groupadd --gid 5000 mindspore \
+  && useradd --home-dir /home/mindspore --create-home --uid 5000 --gid 5000 --shell /bin/sh --skel /dev/null mindspore
+USER mindspore
+
 WORKDIR /usr/src/app
 
 COPY ./run.sh ./run.sh

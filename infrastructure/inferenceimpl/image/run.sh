@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set +o history
 set -euo pipefail
 
 pretrain_file=$(pwd)/pretrain.py
