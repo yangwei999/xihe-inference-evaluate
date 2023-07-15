@@ -1,8 +1,10 @@
 # encoding: utf-8
 
-from collections import namedtuple
+import os
 import json
 import sys
+
+from collections import namedtuple
 
 
 _ModelPath = namedtuple("ModelPath", ["owner", "repo", "file"])
@@ -19,13 +21,18 @@ def _parse_model_path(path):
     s = path.strip().strip("/")
     v = s.split("/")
     if len(v) < 3:
-        raise(_InvalidModelPath("invalid model path"))
+        raise (_InvalidModelPath("invalid model path"))
 
     return _ModelPath(v[0], v[1], "/".join(v[1:]))
 
 
 def _load_config(path):
     result = []
+
+    # check the security path
+    real_path = os.path.realpath(path)
+    if not real_path.startswith("/usr/src/app"):
+        raise (_InvalidModelPath("illegal model path"))
 
     with open(path, 'r') as f:
         data = json.load(f)
@@ -50,6 +57,7 @@ if __name__ == "__main__":
 
     try:
         load(sys.argv[1])
-    except Exception as e:
-        print(e)
+    except:
+        import traceback
+        print(traceback.format_exc())
         sys.exit(1)
