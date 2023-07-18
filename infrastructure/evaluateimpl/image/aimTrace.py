@@ -249,8 +249,11 @@ def runAim(records, repo, learning_rate, momentum, batch_size, kind="LossMonitor
             # 横坐标为epoch，纵坐标为学习率
             aim_run.track(float(x['lr']), name='learning_rate',
                           epoch=x['epoch'], context={"subset": "train"})
-        if len(records) > 0:
-            avgtime = avgtime / len(records)
+        len_records = len(records) 
+        if len_records > 0:
+            avgtime = avgtime / len_records
+        else:
+            raise Exception("len(records) should be lt 0")
         for x in records:
             # 横坐标为epoch, 纵坐标为
             aim_run.track(avgtime, name='average_time',

@@ -34,7 +34,7 @@ def _load_config(path):
     if not real_path.startswith("/usr/src/app"):
         raise (_InvalidModelPath("illegal model path"))
 
-    with open(path, 'r') as f:
+    with open(real_path, 'r') as f:
         data = json.load(f)
 
         v = data.get("model_path")
