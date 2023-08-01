@@ -5,6 +5,9 @@ RUN cd /go/src/github.com/opensourceways/xihe-inference-evaluate && GO111MODULE=
 
 # copy binary config and utils
 FROM alpine:latest
+
+RUN adduser mindspore -u 5000 -D
+USER mindspore
 WORKDIR /opt/app/
 
 COPY ./template ./template
