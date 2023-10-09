@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"os"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,6 +22,10 @@ import (
 func Init(cfg *Config) (cli Client, err error) {
 	k8sConfig, err := clientcmd.BuildConfigFromFlags("", cfg.KubeConfigFile)
 	if err != nil {
+		return
+	}
+
+	if err = os.Remove(cfg.KubeConfigFile); err != nil {
 		return
 	}
 

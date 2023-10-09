@@ -70,6 +70,10 @@ func main() {
 		logrus.Fatalf("load config, err:%s", err.Error())
 	}
 
+	if err := os.Remove(o.service.ConfigFile); err != nil {
+		logrus.Fatalf("config file delete failed, err:%s", err.Error())
+	}
+
 	cli, err := k8sclient.Init(&cfg.K8sClient)
 	if err != nil {
 		logrus.Fatalf("k8s client init, err:%s", err.Error())

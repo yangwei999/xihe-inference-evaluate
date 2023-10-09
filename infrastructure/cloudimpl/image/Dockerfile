@@ -1,5 +1,5 @@
 # jupyter官方镜像提供，为jupyter所需最小docker
-FROM jupyter/base-notebook:latest
+FROM jupyter/base-notebook:ed2908bbb62e
 
 USER root
 
@@ -9,7 +9,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # 安装系统基础命令和依赖
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
     && apt-get update \
-    && apt-get install -y --no-install-recommends figlet curl git git-lfs vim curl wget \
+    && apt-get install -y --no-install-recommends figlet git git-lfs vim wget \
     && apt-get install ffmpeg libsm6 libxext6  -y \
     && rm -rf /var/lib/apt/lists/*
 
@@ -46,7 +46,7 @@ RUN echo "figlet MindSpore" >> ~/.bashrc \
 ENV HOSTNAME=mindspore
 
 RUN jupyter lab --generate-config
-RUN echo 'c.ServerApp.token="f9a3bd4e9f2c3be01cd629154cfb224c2703181e050254b5"' >> ~/.jupyter/jupyter_lab_config.py 
+RUN echo "c.ServerApp.token=\"$JUPYTER_TOKEN\"" >> ~/.jupyter/jupyter_lab_config.py 
 
 RUN mkdir -p /home/mindspore/.jupyter/lab/user-settings/@jupyterlab/terminal-extension \
     && echo '{ "theme": "dark" }' > /home/mindspore/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/plugin.jupyterlab-settings
@@ -62,5 +62,4 @@ COPY --chown=mindspore:mindspore  Jupyter操作文档.ipynb  ./
 EXPOSE 8080 
 
 # 真实执行命令
-# http://127.0.0.1:8080/lab?token=f9a3bd4e9f2c3be01cd629154cfb224c2703181e050254b5
 CMD jupyter lab  --notebook-dir=/home/mindspore/work --ip='*' --port=8080 --no-browser
