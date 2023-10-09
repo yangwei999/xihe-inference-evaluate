@@ -5,6 +5,7 @@ USER root
 
 # 安装时不interative
 ARG DEBIAN_FRONTEND=noninteractive
+ARG JUPYTER_TOKEN
 
 # 安装系统基础命令和依赖
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
@@ -46,7 +47,7 @@ RUN echo "figlet MindSpore" >> ~/.bashrc \
 ENV HOSTNAME=mindspore
 
 RUN jupyter lab --generate-config
-RUN echo "c.ServerApp.token=\"$JUPYTER_TOKEN\"" >> ~/.jupyter/jupyter_lab_config.py 
+RUN echo "c.ServerApp.token=${JUPYTER_TOKEN}" >> ~/.jupyter/jupyter_lab_config.py 
 
 RUN mkdir -p /home/mindspore/.jupyter/lab/user-settings/@jupyterlab/terminal-extension \
     && echo '{ "theme": "dark" }' > /home/mindspore/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/plugin.jupyterlab-settings
