@@ -2,15 +2,15 @@ package config
 
 import (
 	"github.com/opensourceways/community-robot-lib/utils"
-
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/cloudimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/k8sclient"
+	xiheutils "github.com/opensourceways/xihe-server/utils"
 )
 
 func LoadConfig(path string, cfg interface{}) error {
-	if err := utils.LoadFromYaml(path, cfg); err != nil {
+	if err := xiheutils.LoadFromYaml(path, cfg); err != nil {
 		return err
 	}
 
