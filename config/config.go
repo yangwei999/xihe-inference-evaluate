@@ -3,9 +3,9 @@ package config
 import (
 	"os"
 
-	"github.com/opensourceways/community-robot-lib/utils"
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 
+	"github.com/opensourceways/community-robot-lib/utils"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/cloudimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/inferenceimpl"
