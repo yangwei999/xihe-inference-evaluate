@@ -446,8 +446,6 @@ github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb
 github.com/opensourceways/go-gitee v0.0.0-20220714075315-cb246f1dfb96/go.mod h1:yvVsEMhp7frMblzN1sco4C7cRlnlpqkkn3O2JQNdRu0=
 github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230317111524-e67370a0eb26 h1:63pThXt1AFaPtN5UOwtl1VLbNrMEbES+MqLaD9CS2DQ=
 github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230317111524-e67370a0eb26/go.mod h1:oDg3IkriEaMnfzSah7fscVp8nq7+baTNPelKPgHSrqY=
-github.com/opensourceways/xihe-server v0.0.0-20230720024910-f993aa09eb8a h1:B4udtHCqkRszIhyaC13qv4eElG9AXCc43/GsBrWbQEA=
-github.com/opensourceways/xihe-server v0.0.0-20230720024910-f993aa09eb8a/go.mod h1:F09sCZC9+nGXzXiNSGbr6rLkRMt+YZumEDMts1qs/jk=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
