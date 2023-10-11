@@ -226,12 +226,6 @@ def runAim(records, repo, learning_rate, momentum, batch_size, kind="LossMonitor
     """
     aim_run = Run(experiment="-".join([str(learning_rate), str(momentum), str(
         batch_size)]), repo=repo)  # replace example IP with your tracking server IP/hostname
-    # Log run parameters
-    # aim_run['params'] = {
-    #     'learning_rate': learning_rate,
-    #     'momentum' :  momentum,
-    #     'batch_size': batch_size,
-    # }
     aim_run['learning_rate'] = learning_rate
     aim_run['momentum'] = momentum
     aim_run['batch_size'] = batch_size
@@ -278,9 +272,6 @@ def main(args):
     # 读取aim相关超参数
     log_path = args.log_path
     repo = args.repo
-    # user = args.user
-    # project = args.project
-    # job_id = args.job_id
     learning_rate_scope = eval(args.learning_rate_scope)
     batch_size_scope = eval(args.batch_size_scope)
     momentum_scope = eval(args.momentum_scope)
@@ -313,14 +304,10 @@ def main(args):
         lr = record[0]['lr']
         mom = record[0]['momentum']
         bs = record[0]['batch_size']
-        # print(lr, mom, bs)
         runAim(record, repo, lr, mom, bs, kind)
 
 
 if __name__ == "__main__":
-    # batch_size_choice = [32, 64, 128]
-    # learning_rate_choice = [0.1, 0.01, 0.02, 0.04]
-    # momentum_choice = [0.9, 0.99]
     # 获取超参数
     args_opt = parse_args()
     # 使用aim跟踪日志数据
