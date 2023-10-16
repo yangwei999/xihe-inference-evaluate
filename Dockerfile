@@ -4,7 +4,7 @@ RUN dnf update -y && \
     go env -w GOPROXY=https://goproxy.cn,direct
 # build binary
 COPY . /go/src/github.com/opensourceways/xihe-inference-evaluate
-RUN cd /go/src/github.com/opensourceways/xihe-inference-evaluate && GO111MODULE=on CGO_ENABLED=0 go build
+RUN cd /go/src/github.com/opensourceways/xihe-inference-evaluate && GO111MODULE=on CGO_ENABLED=0 go build -buildmode=pie --ldflags "-s -linkmode 'external' -extldflags '-Wl,-z,now'"
 
 # copy binary config and utils
 FROM openeuler/openeuler:22.03
