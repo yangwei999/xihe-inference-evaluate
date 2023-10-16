@@ -11,8 +11,8 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.8.12
-	k8s.io/api v0.25.3
-	k8s.io/apimachinery v0.26.1
+	k8s.io/api v0.25.0
+	k8s.io/apimachinery v0.25.3
 	k8s.io/client-go v0.25.0
 	sigs.k8s.io/yaml v1.3.0
 )
