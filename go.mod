@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/opensourceways/code-server-operator v0.0.0-20220811125600-e78ea6761c18
-	github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb
+	github.com/opensourceways/community-robot-lib v0.0.0-20231018034126-a664e14dbb9d
 	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20231016132418-95a47394b355
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/files v1.0.1
