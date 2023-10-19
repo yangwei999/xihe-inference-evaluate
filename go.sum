@@ -450,8 +450,8 @@ github.com/opensourceways/code-server-operator v0.0.0-20220811125600-e78ea6761c1
 github.com/opensourceways/community-robot-lib v0.0.0-20231018034126-a664e14dbb9d h1:g/i5rlWzEDeSxbcf8zlzYB5m/tManw5ZLfwnM8obi+c=
 github.com/opensourceways/community-robot-lib v0.0.0-20231018034126-a664e14dbb9d/go.mod h1:LlcEXB8B167NgeE8klLcztmg8oeGHJNEeZGv7xmxxFU=
 github.com/opensourceways/go-gitee v0.0.0-20231017075452-8c3dcc460ed2/go.mod h1:davbfHJ2gG4YY3cnsiWzG6VUptVWIFi+ltNldgmgySQ=
-github.com/opensourceways/xihe-grpc-protocol v0.0.0-20231016132418-95a47394b355 h1:H2VrXLMdp2cwYP5NoieCs3kMNQ4fwsGzA6aWz3A0FTo=
-github.com/opensourceways/xihe-grpc-protocol v0.0.0-20231016132418-95a47394b355/go.mod h1:5P7amg+mFD8+CyQTrZ9DxZy97+5gcHLWZQGK8IKnZaU=
+github.com/opensourceways/xihe-grpc-protocol v0.0.0-20231018090501-e7ea782f5815 h1:iC6Wb82l9c/tZFgH9ITDCrD7H/HMf+QIvmS0y70Ck5s=
+github.com/opensourceways/xihe-grpc-protocol v0.0.0-20231018090501-e7ea782f5815/go.mod h1:VGOxZagbC7dxDXuFKm3nK1iTJHYYIQ62Bth7H/8bmGU=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
