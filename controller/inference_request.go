@@ -29,6 +29,7 @@ type InferenceCreateRequest struct {
 	LastCommit   string `json:"last_commit"`
 	ProjectName  string `json:"project_name"`
 	SurvivalTime int    `json:"survival_time"`
+	Requester    string `json:"requester"`
 }
 
 func (req *InferenceCreateRequest) toCmd() (
@@ -45,6 +46,7 @@ func (req *InferenceCreateRequest) toCmd() (
 	cmd.UserToken = req.UserToken
 	cmd.LastCommit = req.LastCommit
 	cmd.SurvivalTime = req.SurvivalTime
+	cmd.Requester = req.Requester
 
 	err = cmd.Validate()
 

@@ -1,3 +1,12 @@
+FROM alpine:3.14 as BUILDER
+RUN apk update && apk add --no-cache \
+        git \
+        bash \
+        libc6-compat
+WORKDIR /opt/build
+COPY ./obsutil.tar.gz ./obsutil.tar.gz
+RUN tar -xf ./obsutil.tar.gz
+
 # real service
 FROM python:3.9.13
 
@@ -13,8 +22,9 @@ USER mindspore
 
 WORKDIR /usr/src/app
 
-COPY --chown=mindspore:mindspore ./run.sh ./run.sh
-COPY --chown=mindspore:mindspore ./requirements.txt ./requirements.txt
+COPY --chown=mindspore:mindspore ./prepare.sh ./prepare.sh
+COPY --chown=mindspore:mindspore --from=BUILDER /opt/build/obsutil /usr/src/app/obsutil
+COPY --chown=mindspore:mindspore ./pretrain.py ./pretrain.py
 
 RUN pip install --upgrade -i https://pypi.mirrors.ustc.edu.cn/simple pip
 RUN pip install --default-timeout=1000 --user -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
@@ -22,4 +32,4 @@ RUN pip install --default-timeout=1000 --user -i https://pypi.mirrors.ustc.edu.c
 # TODO: what's the purpose
 EXPOSE 7860
 
-ENTRYPOINT ["/usr/src/app/run.sh"]
+ENTRYPOINT ["/usr/src/app/prepare.sh"]

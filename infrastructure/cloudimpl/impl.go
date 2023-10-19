@@ -111,7 +111,7 @@ func (impl *cloudImpl) NotifyResult(labels map[string]string, status domain.Cont
 
 	info := rpccloud.PodInfo{
 		Error:     status.ErrorMsg,
-		AccessURL: fmt.Sprintf("%s?token=%s", status.AccessUrl, impl.cfg.JupyterToken),
+		AccessURL: status.AccessUrl,
 	}
 
 	if err := impl.rpcCli.SetPodInfo(&cloud, &info); err != nil {
@@ -138,6 +138,7 @@ func (impl *cloudImpl) getObj(
 		Name:           impl.geneMetaName(cloud),
 		NameSpace:      k8sConfig.Namespace,
 		Image:          crd.CRDImage,
+		User:           cloud.User,
 		CPU:            crd.CRDCpuString(),
 		Memory:         crd.CRDMemoryString(),
 		StorageSize:    20,
@@ -156,6 +157,7 @@ type crdData struct {
 	Name           string
 	NameSpace      string
 	Image          string
+	User           string
 	CPU            string
 	Memory         string
 	StorageSize    int

@@ -34,3 +34,5 @@ spec:
       value: "{{.ContainerPort}}"
     - name: JUPYTER_SERVER_NAME
       value: "0.0.0.0"
+    - name: USER
+      value: {{.User}}

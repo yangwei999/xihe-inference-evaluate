@@ -20,7 +20,8 @@ func (cmd *InferenceCreateCmd) Validate() error {
 		cmd.LastCommit == "" ||
 		cmd.ProjectName == nil ||
 		cmd.UserToken == "" ||
-		cmd.SurvivalTime <= 0
+		cmd.SurvivalTime <= 0 ||
+		cmd.Requester == ""
 
 	if b {
 		return errors.New("invalid cmd")

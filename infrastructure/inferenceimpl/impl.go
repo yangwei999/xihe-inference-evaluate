@@ -168,6 +168,8 @@ func (impl inferenceImpl) getObj(
 		Name:           impl.geneMetaName(&infer.InferenceIndex),
 		NameSpace:      k8sConfig.Namespace,
 		Image:          crd.CRDImage,
+		InitImage:      crd.CRDInitImage,
+		User:           infer.Requester,
 		CPU:            crd.CRDCpuString(),
 		Memory:         crd.CRDMemoryString(),
 		StorageSize:    20,
@@ -199,6 +201,8 @@ type crdData struct {
 	Name           string
 	NameSpace      string
 	Image          string
+	InitImage      string
+	User           string
 	CPU            string
 	Memory         string
 	StorageSize    int
