@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 )
 
@@ -36,4 +37,25 @@ func (cfg *CRDConfig) SetDefault() {
 	if cfg.ContainerPort <= 0 {
 		cfg.ContainerPort = 8080
 	}
+
+	// get image tag from environment variable
+	if image, ok := os.LookupEnv("CRD_IMAGE"); ok {
+		cfg.CRDImage = image
+	}
+
+	if initImage, ok := os.LookupEnv("CRD_INIT_IMAGE"); ok {
+		cfg.CRDInitImage = initImage
+	}
+}
+
+func (cfg *CRDConfig) Validate() error {
+	if cfg.CRDImage == "" {
+		return fmt.Errorf("crd image must be set")
+	}
+
+	if cfg.CRDInitImage == "" {
+		return fmt.Errorf("crd init image must be set")
+	}
+
+	return nil
 }
