@@ -43,6 +43,7 @@ spec:
   inactiveAfterSeconds: 0
   recycleAfterSeconds: {{.RecycleSeconds}}
   restartPolicy: Never
+  enableOauth2Proxy: true
   nodeSelector:
     inference: "true"
   resources:

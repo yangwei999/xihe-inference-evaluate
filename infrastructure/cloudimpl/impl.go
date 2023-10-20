@@ -132,38 +132,40 @@ func (impl *cloudImpl) getObj(
 	k8sConfig := &impl.k8sConfig
 
 	data := &crdData{
-		Group:          k8sConfig.Group,
-		Version:        k8sConfig.Version,
-		CodeServer:     k8sConfig.Kind,
-		Name:           impl.geneMetaName(cloud),
-		NameSpace:      k8sConfig.Namespace,
-		Image:          crd.CRDImage,
-		User:           cloud.User,
-		CPU:            crd.CRDCpuString(),
-		Memory:         crd.CRDMemoryString(),
-		StorageSize:    20,
-		RecycleSeconds: int(cloud.SurvivalTime.SurvivalTime()),
-		Labels:         impl.geneLabels(cloud),
-		ContainerPort:  crd.CRDContainerPortString(),
+		Group:               k8sConfig.Group,
+		Version:             k8sConfig.Version,
+		CodeServer:          k8sConfig.Kind,
+		Name:                impl.geneMetaName(cloud),
+		NameSpace:           k8sConfig.Namespace,
+		Image:               crd.CRDImage,
+		User:                cloud.User,
+		CPU:                 crd.CRDCpuString(),
+		Memory:              crd.CRDMemoryString(),
+		StorageSize:         20,
+		RecycleSeconds:      int(cloud.SurvivalTime.SurvivalTime()),
+		Labels:              impl.geneLabels(cloud),
+		ContainerPort:       crd.CRDContainerPortString(),
+		AccessTokenEndpoint: crd.AccessTokenEndpoint,
 	}
 
 	return data.genTemplate(impl.crdTemplate, obj)
 }
 
 type crdData struct {
-	Group          string
-	Version        string
-	CodeServer     string
-	Name           string
-	NameSpace      string
-	Image          string
-	User           string
-	CPU            string
-	Memory         string
-	StorageSize    int
-	RecycleSeconds int
-	Labels         map[string]string
-	ContainerPort  string
+	Group               string
+	Version             string
+	CodeServer          string
+	Name                string
+	NameSpace           string
+	Image               string
+	User                string
+	CPU                 string
+	Memory              string
+	StorageSize         int
+	RecycleSeconds      int
+	Labels              map[string]string
+	ContainerPort       string
+	AccessTokenEndpoint string
 }
 
 func (data *crdData) genTemplate(tmpl *template.Template, obj *unstructured.Unstructured) error {

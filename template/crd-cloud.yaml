@@ -27,6 +27,7 @@ spec:
       cpu: "{{.CPU}}"
       memory: {{.Memory}}
   connectProbe: /
+  enableOauth2Proxy: true
   workspaceLocation: /workspace
   containerPort: "{{.ContainerPort}}"
   envs:
