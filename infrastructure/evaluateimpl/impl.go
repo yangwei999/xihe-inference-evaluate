@@ -186,46 +186,46 @@ func (impl *evaluateImpl) genCrdData(
 	k8sConfig := &impl.k8sConfig
 
 	*data = crdData{
-		Group:          k8sConfig.Group,
-		Version:        k8sConfig.Version,
-		CodeServer:     k8sConfig.Kind,
-		Name:           impl.geneMetaName(index),
-		NameSpace:      k8sConfig.Namespace,
-		Image:          crd.CRDImage,
-		CPU:            crd.CRDCpuString(),
-		Memory:         crd.CRDMemoryString(),
-		StorageSize:    10,
-		RecycleSeconds: survivalTime,
-		Labels:         impl.geneLabels(index),
-		ContainerPort:  crd.CRDContainerPortString(),
-
-		ObsAk:       obs.AccessKey,
-		ObsSk:       obs.SecretKey,
-		ObsBucket:   obs.Bucket,
-		ObsEndPoint: obs.Endpoint,
-		ObsUtilPath: obs.OBSUtilPath,
+		Group:               k8sConfig.Group,
+		Version:             k8sConfig.Version,
+		CodeServer:          k8sConfig.Kind,
+		Name:                impl.geneMetaName(index),
+		NameSpace:           k8sConfig.Namespace,
+		Image:               crd.CRDImage,
+		CPU:                 crd.CRDCpuString(),
+		Memory:              crd.CRDMemoryString(),
+		StorageSize:         10,
+		RecycleSeconds:      survivalTime,
+		Labels:              impl.geneLabels(index),
+		ContainerPort:       crd.CRDContainerPortString(),
+		AccessTokenEndpoint: crd.AccessTokenEndpoint,
+		ObsAk:               obs.AccessKey,
+		ObsSk:               obs.SecretKey,
+		ObsBucket:           obs.Bucket,
+		ObsEndPoint:         obs.Endpoint,
+		ObsUtilPath:         obs.OBSUtilPath,
 	}
 }
 
 type crdData struct {
-	Group          string
-	Version        string
-	CodeServer     string
-	Name           string
-	NameSpace      string
-	Image          string
-	CPU            string
-	Memory         string
-	StorageSize    int
-	RecycleSeconds int
-	Labels         map[string]string
-	ContainerPort  string
-
-	ObsAk       string
-	ObsSk       string
-	ObsBucket   string
-	ObsEndPoint string
-	ObsUtilPath string
+	Group               string
+	Version             string
+	CodeServer          string
+	Name                string
+	NameSpace           string
+	Image               string
+	CPU                 string
+	Memory              string
+	StorageSize         int
+	RecycleSeconds      int
+	Labels              map[string]string
+	ContainerPort       string
+	AccessTokenEndpoint string
+	ObsAk               string
+	ObsSk               string
+	ObsBucket           string
+	ObsEndPoint         string
+	ObsUtilPath         string
 
 	OBSPath       string
 	EvaluateType  string

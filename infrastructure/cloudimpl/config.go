@@ -1,6 +1,10 @@
 package cloudimpl
 
-import "github.com/opensourceways/xihe-inference-evaluate/infrastructure/config"
+import (
+	"os"
+
+	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/config"
+)
 
 type configValidate interface {
 	Validate() error
@@ -29,6 +33,14 @@ func (cfg *Config) SetDefault() {
 		if f, ok := i.(configSetDefault); ok {
 			f.SetDefault()
 		}
+	}
+
+	if image, ok := os.LookupEnv("CLOUD_IMAGE"); ok {
+		cfg.CRD.CRDImage = image
+	}
+
+	if image, ok := os.LookupEnv("CLOUD_INIT_IMAGE"); ok {
+		cfg.CRD.CRDInitImage = image
 	}
 }
 

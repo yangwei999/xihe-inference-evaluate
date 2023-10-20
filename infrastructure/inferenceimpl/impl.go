@@ -162,20 +162,21 @@ func (impl inferenceImpl) getObj(
 	k8sConfig := &impl.k8sConfig
 
 	data := &crdData{
-		Group:          k8sConfig.Group,
-		Version:        k8sConfig.Version,
-		CodeServer:     k8sConfig.Kind,
-		Name:           impl.geneMetaName(&infer.InferenceIndex),
-		NameSpace:      k8sConfig.Namespace,
-		Image:          crd.CRDImage,
-		InitImage:      crd.CRDInitImage,
-		User:           infer.Requester,
-		CPU:            crd.CRDCpuString(),
-		Memory:         crd.CRDMemoryString(),
-		StorageSize:    20,
-		RecycleSeconds: infer.SurvivalTime,
-		Labels:         impl.geneLabels(infer),
-		ContainerPort:  crd.CRDContainerPortString(),
+		Group:               k8sConfig.Group,
+		Version:             k8sConfig.Version,
+		CodeServer:          k8sConfig.Kind,
+		Name:                impl.geneMetaName(&infer.InferenceIndex),
+		NameSpace:           k8sConfig.Namespace,
+		Image:               crd.CRDImage,
+		InitImage:           crd.CRDInitImage,
+		User:                infer.Requester,
+		CPU:                 crd.CRDCpuString(),
+		Memory:              crd.CRDMemoryString(),
+		StorageSize:         20,
+		RecycleSeconds:      infer.SurvivalTime,
+		Labels:              impl.geneLabels(infer),
+		ContainerPort:       crd.CRDContainerPortString(),
+		AccessTokenEndpoint: crd.AccessTokenEndpoint,
 
 		GitlabEndPoint: impl.cfg.GitlabEndpoint,
 		XiheUser:       infer.Project.Owner.Account(),
@@ -195,20 +196,21 @@ func (impl inferenceImpl) getObj(
 }
 
 type crdData struct {
-	Group          string
-	Version        string
-	CodeServer     string
-	Name           string
-	NameSpace      string
-	Image          string
-	InitImage      string
-	User           string
-	CPU            string
-	Memory         string
-	StorageSize    int
-	RecycleSeconds int
-	Labels         map[string]string
-	ContainerPort  string
+	Group               string
+	Version             string
+	CodeServer          string
+	Name                string
+	NameSpace           string
+	Image               string
+	InitImage           string
+	User                string
+	CPU                 string
+	Memory              string
+	StorageSize         int
+	RecycleSeconds      int
+	Labels              map[string]string
+	ContainerPort       string
+	AccessTokenEndpoint string
 
 	GitlabEndPoint string
 	XiheUser       string

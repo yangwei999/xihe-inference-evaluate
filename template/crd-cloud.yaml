@@ -36,3 +36,5 @@ spec:
       value: "0.0.0.0"
     - name: USER
       value: {{.User}}
+    - name: ACCESS_TOKEN_ENDPOINT
+      value: {{.AccessTokenEndpoint}}
