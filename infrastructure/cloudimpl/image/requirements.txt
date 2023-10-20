@@ -19,4 +19,4 @@ download
 tinyms
 gradio==3.21.0
 aim
-https://obs-xihe-beijing4.obs.cn-north-4.myhuaweicloud.com/cann/mindformers/mindformers-0.3.0-py3-none-any.whl
+mindformers
