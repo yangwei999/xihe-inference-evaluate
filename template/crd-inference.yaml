@@ -61,6 +61,6 @@ spec:
     - name: GRADIO_SERVER_NAME
       value: "0.0.0.0"
     - name: USER
-      value: {{.User}}
+      value: "{{.User}}"
     - name: ACCESS_TOKEN_ENDPOINT
-      value: {{.AccessTokenEndpoint}}
+      value: "{{.AccessTokenEndpoint}}"

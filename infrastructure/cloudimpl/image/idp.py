@@ -26,9 +26,19 @@ class XiheIdentityProvider(IdentityProvider):
     def get_user(self, handler):
         name = handler._headers.get("X-Forwarded-User")
         ak = handler._headers.get("X-Forwarded-Access-Token")
+        if name is None:
+            print("missing user")
+            return None
+        if ak is None:
+            print("missing access token")
+            return None
         auth_url = os.getenv("ACCESS_TOKEN_ENDPOINT")
+        if auth_url:
+            print(f"missing auth url")
+            return None
         res = requests.get(auth_url, headers={"Authorization": f"{ak}"})
         if res.status_code != 200:
+            print(f"get user failed: {res.status_code}")
             return None
         env_name = os.getenv("USER")
 

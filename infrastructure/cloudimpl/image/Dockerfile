@@ -1,5 +1,5 @@
 # jupyter官方镜像提供，为jupyter所需最小docker
-FROM jupyter/base-notebook:ed2908bbb62e
+FROM jupyter/base-notebook:python-3.9.13
 
 USER root
 
