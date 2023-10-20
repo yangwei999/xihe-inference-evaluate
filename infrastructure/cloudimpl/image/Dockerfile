@@ -53,9 +53,9 @@ WORKDIR /home/mindspore/work
 # 将demo复制到镜像中
 COPY --chown=mindspore:mindspore  傻瓜式教程.ipynb  ./
 COPY --chown=mindspore:mindspore  Jupyter操作文档.ipynb  ./
-
+COPY --chown=mindspore:mindspore  idp.py  /home/mindspore/work/idp.py
 # 暴露端口
 EXPOSE 8080
 
 # 真实执行命令
-CMD jupyter lab  --notebook-dir=/home/mindspore/work --ip='*' --port=8080 --no-browser --config idp.py
+CMD jupyter lab  --notebook-dir=/home/mindspore/work --ip='*' --port=8080 --no-browser --config /home/mindspore/work/idp.py
