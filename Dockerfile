@@ -19,4 +19,8 @@ WORKDIR /opt/app/
 COPY  --chown=mindspore ./template ./template
 COPY  --chown=mindspore --from=BUILDER /go/src/github.com/opensourceways/xihe-inference-evaluate/xihe-inference-evaluate /opt/app
 
+RUN chmod 750 ./template && \
+    for file in ./template/*; do if [ -f "$file" ]; then chmod 640 "$file"; fi; done
+RUN chmod 550 /opt/app/xihe-inference-evaluate
+
 ENTRYPOINT ["/opt/app/xihe-inference-evaluate"]
