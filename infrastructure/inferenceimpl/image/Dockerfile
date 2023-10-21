@@ -7,8 +7,7 @@ RUN groupadd --gid 5000 mindspore \
 
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6 -y
-RUN apt install libgl1-mesa-glx nginx tini -y
-COPY --chmod=640 --chown=mindspore:mindspore ./auth.conf /etc/nginx/conf.d/
+RUN apt install libgl1-mesa-glx tini -y
 
 USER mindspore
 ENV PATH="${PATH}:/home/mindspore/.local/bin"
@@ -16,7 +15,6 @@ WORKDIR /usr/src/app
 
 COPY --chown=mindspore:mindspore ./run.sh ./run.sh
 COPY --chown=mindspore:mindspore ./requirements.txt ./requirements.txt
-COPY --chown=mindspore:mindspore ./auth.py ./auth.py
 
 RUN pip install --upgrade -i https://pypi.mirrors.ustc.edu.cn/simple pip
 RUN pip install --default-timeout=1000 --user -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
@@ -24,6 +22,5 @@ RUN pip install --default-timeout=1000 --user -i https://pypi.mirrors.ustc.edu.c
 # TODO: what's the purpose
 EXPOSE 5002
 
-USER root
 ENTRYPOINT ["tini", "--"]
 CMD ["/usr/src/app/run.sh"]

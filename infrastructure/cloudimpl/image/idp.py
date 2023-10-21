@@ -24,25 +24,29 @@ class XiheIdentityProvider(IdentityProvider):
     """
 
     def get_user(self, handler):
-        name = handler._headers.get("X-Forwarded-User")
-        ak = handler._headers.get("X-Forwarded-Access-Token")
-        if name is None:
-            print("missing user")
-            return None
+        ak = handler._headers.get("X-Auth-Request-Access-Token")
         if ak is None:
             print("missing access token")
             return None
+
         auth_url = os.getenv("ACCESS_TOKEN_ENDPOINT")
         if auth_url:
             print(f"missing auth url")
             return None
+
         res = requests.get(auth_url, headers={"Authorization": f"{ak}"})
         if res.status_code != 200:
             print(f"get user failed: {res.status_code}")
             return None
-        env_name = os.getenv("USER")
 
-        return XiheUser(env_name) if env_name == name else None
+        user = res.json().get("username")
+        if user is None:
+            print(f"missing user data")
+            return None
+
+        env_name = os.getenv("USER")
+        print(f"{user} vs {env_name}")
+        return XiheUser(env_name) if env_name == user else None
 
 c = get_config()  # noqa
 

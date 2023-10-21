@@ -7,10 +7,6 @@ app=app.py
 work_dir=/workspace
 inference_dir=$work_dir/$project_name/inference
 
-# run auth
-su - mindspore -c "python3 $(pwd)/auth.py" &
-nginx &
-
 # run user define app
 cd $inference_dir
 
@@ -20,4 +16,4 @@ if [ -e "$f" -a -s "$f" ]; then
     pip install -r ./$f -i https://pypi.tuna.tsinghua.edu.cn/simple
 fi
 
-su - mindspore -c "python3 ./$app"
+python3 ./$app

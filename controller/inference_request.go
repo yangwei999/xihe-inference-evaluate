@@ -49,7 +49,6 @@ func (req *InferenceCreateRequest) toCmd() (
 	cmd.Requester = req.Requester
 
 	err = cmd.Validate()
-
 	return
 }
 
