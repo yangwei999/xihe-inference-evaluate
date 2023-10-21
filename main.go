@@ -12,7 +12,6 @@ import (
 	"github.com/opensourceways/xihe-inference-evaluate/controller"
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/cloudimpl"
-	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/watchimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/k8sclient"
@@ -79,12 +78,6 @@ func main() {
 		logrus.Fatalf("k8s client init, err:%s", err.Error())
 	}
 
-	// evaluate
-	evaluate, err := evaluateimpl.NewEvaluate(&cli, &cfg.Evaluate, cfg.K8sClient)
-	if err != nil {
-		logrus.Fatalf("new evaluate service failed, err:%s", err.Error())
-	}
-
 	// inference
 	inference, err := inferenceimpl.NewInference(&cli, &cfg.Inference, cfg.K8sClient)
 	if err != nil {
@@ -105,7 +98,6 @@ func main() {
 		&cli,
 		map[string]func(map[string]string, domain.ContainerDetail){
 			inferenceimpl.MetaName(): inference.NotifyResult,
-			evaluateimpl.MetaName():  evaluate.NotifyResult,
 			cloudimpl.MetaName():     cloud.NotifyResult,
 		},
 	)
@@ -117,7 +109,6 @@ func main() {
 	server.StartWebServer(
 		o.service.Port, o.service.GracePeriod, cfg,
 		&server.Service{
-			Evaluate:  evaluate,
 			Inference: inference,
 			Cloud:     cloud,
 		},

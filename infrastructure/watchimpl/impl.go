@@ -16,7 +16,6 @@ import (
 
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/cloudimpl"
-	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/k8sclient"
 )
@@ -40,7 +39,6 @@ func NewWatcher(
 		handles: handles,
 		podNamePrifixes: []string{
 			inferenceimpl.MetaName(),
-			evaluateimpl.MetaName(),
 			cloudimpl.MetaName(),
 		},
 	}
