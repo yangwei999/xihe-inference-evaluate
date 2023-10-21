@@ -30,11 +30,6 @@ type Watcher struct {
 	wg              sync.WaitGroup
 }
 
-type statusDetail struct {
-	accessUrl string
-	errorMsg  string
-}
-
 func NewWatcher(
 	cli *k8sclient.Client,
 	handles map[string]func(map[string]string, domain.ContainerDetail),
