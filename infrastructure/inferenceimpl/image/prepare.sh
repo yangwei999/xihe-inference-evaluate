@@ -17,7 +17,7 @@ obs_sk=${OBS_SK}
 obs_endpoint=${OBS_ENDPOINT}
 obs_util=${OBS_UTIL_PATH}
 obs_lfs_path=${OBS_BUCKET}/${OBS_LFS_PATH} #$OBS_LFS_PATH has no suffix of /.
-
+app=app.py
 $obs_util config -i=$obs_ak -k=$obs_sk -e=$obs_endpoint
 
 work_dir=/workspace
@@ -67,7 +67,7 @@ test -d $work_dir || mkdir $work_dir
 cd $work_dir
 
 # download project
-git clone $repo_url/$xihe_user/$project_name
+rm -rf $project_name && git clone $repo_url/$xihe_user/$project_name
 
 if [ ! -e "$inference_dir/$app" ]; then
     echo "no $app"

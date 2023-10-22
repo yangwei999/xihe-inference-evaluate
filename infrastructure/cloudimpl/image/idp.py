@@ -38,7 +38,7 @@ class XiheIdentityProvider(IdentityProvider):
 
         res = requests.get(auth_url, headers={"authorization": f"{ak}", "x-authing-userpool-id": f"{pool_id}"})
         if res.status_code != 200:
-            app_log.error(f"get user failed: {res.status_code}")
+            app_log.error(f"get user failed: {res.status_code} for {auth_url}")
             return None
 
         user_data = res.json().get("data")

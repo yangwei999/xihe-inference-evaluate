@@ -13,14 +13,14 @@ USER mindspore
 ENV PATH="${PATH}:/home/mindspore/.local/bin"
 WORKDIR /usr/src/app
 
-COPY --chown=mindspore:mindspore ./run.sh ./run.sh
+COPY --chown=mindspore:mindspore --chmod=550 ./run.sh ./run.sh
 COPY --chown=mindspore:mindspore ./requirements.txt ./requirements.txt
 
 RUN pip install --upgrade -i https://pypi.mirrors.ustc.edu.cn/simple pip
 RUN pip install --default-timeout=1000 --user -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
-
+RUN rm -f ./requirements.txt
 # TODO: what's the purpose
-EXPOSE 5002
+EXPOSE 7860
 
 ENTRYPOINT ["tini", "--"]
 CMD ["/usr/src/app/run.sh"]

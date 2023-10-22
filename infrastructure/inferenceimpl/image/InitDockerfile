@@ -18,8 +18,8 @@ USER mindspore
 
 WORKDIR /usr/src/app
 
-COPY --chown=mindspore:mindspore ./prepare.sh ./prepare.sh
-COPY --chown=mindspore:mindspore --from=BUILDER /opt/build/obsutil /usr/src/app/obsutil
-COPY --chown=mindspore:mindspore ./pretrain.py ./pretrain.py
+COPY --chown=mindspore:mindspore --chmod=550 ./prepare.sh ./prepare.sh
+COPY --chown=mindspore:mindspore --chmod=550 --from=BUILDER /opt/build/obsutil /usr/src/app/obsutil
+COPY --chown=mindspore:mindspore --chmod=550 ./pretrain.py ./pretrain.py
 
 ENTRYPOINT ["/usr/src/app/prepare.sh"]
