@@ -12,7 +12,7 @@ spec:
   initContainers:
     - name: init-codeserver
       image: {{.InitImage}}
-      envs:
+      env:
         - name: GITLAB_ENDPOINT
           value: {{.GitlabEndPoint}}
         - name: XIHE_USER
