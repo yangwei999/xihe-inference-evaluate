@@ -18,6 +18,7 @@ type Config struct {
 	CRD          config.CRDConfig `json:"crd"              required:"true"`
 	RPCEndpoint  string           `json:"rpc_endpiont"     required:"true"`
 	JupyterToken string           `json:"jupyter_token"    required:"true"`
+	UserPoolId   string           `json:"user_pool_id"    required:"true"`
 }
 
 func (cfg *Config) configItems() []interface{} {

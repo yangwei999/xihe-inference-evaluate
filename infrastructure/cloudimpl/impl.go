@@ -141,6 +141,7 @@ func (impl *cloudImpl) getObj(
 		User:                cloud.User,
 		CPU:                 crd.CRDCpuString(),
 		Memory:              crd.CRDMemoryString(),
+		UserPoolId:          impl.cfg.UserPoolId,
 		StorageSize:         20,
 		RecycleSeconds:      int(cloud.SurvivalTime.SurvivalTime()),
 		Labels:              impl.geneLabels(cloud),
@@ -157,6 +158,7 @@ type crdData struct {
 	CodeServer          string
 	Name                string
 	NameSpace           string
+	UserPoolId          string
 	Image               string
 	User                string
 	CPU                 string

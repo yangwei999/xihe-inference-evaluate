@@ -31,19 +31,32 @@ class XiheIdentityProvider(IdentityProvider):
             app_log.error(f"missing auth url")
             return None
 
-        res = requests.get(auth_url, headers={"Authorization": f"{ak}"})
+        pool_id = os.getenv("USER_POOL")
+        if pool_id == None:
+            app_log.error(f"missing pool id")
+            return None
+
+        res = requests.get(auth_url, headers={"authorization": f"{ak}", "x-authing-userpool-id": f"{pool_id}"})
         if res.status_code != 200:
             app_log.error(f"get user failed: {res.status_code}")
             return None
 
-        user = res.json().get("username")
+        user_data = res.json().get("data")
+        if user_data is None:
+            app_log.error(f"missing user data in response")
+            return None
+
+        user = user_data.get("username")
         if user is None:
-            app_log.error(f"missing user data")
+            app_log.error(f"missing username in user_data")
             return None
 
         env_name = os.getenv("USER")
-        app_log.info(f"{user} vs {env_name}")
-        return XiheUser(env_name) if env_name == user else None
+        if env_name == user:
+            return XiheUser(env_name)
+
+        app_log.warning(f"requester {user} missmatch")
+        return None
 
 c = get_config()  # noqa
 
