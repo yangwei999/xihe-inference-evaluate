@@ -25,6 +25,7 @@ ENV CHOWN_HOME=yes
 ENV DOCKER_STACKS_JUPYTER_CMD=lab
 ENV HOME=/home/mindspore
 ENV PWD=/home/mindspore
+COPY --chown=root:root --chmod=755 idp.py /usr/lib/idp.py
 
 # 切换用户
 USER $NB_UID
@@ -51,11 +52,10 @@ RUN mkdir -p /home/mindspore/.jupyter/lab/user-settings/@jupyterlab/terminal-ext
 WORKDIR /home/mindspore/work
 
 # 将demo复制到镜像中
-COPY --chown=mindspore:mindspore  傻瓜式教程.ipynb  ./
-COPY --chown=mindspore:mindspore  Jupyter操作文档.ipynb  ./
-COPY --chown=mindspore:mindspore  idp.py  /home/mindspore/work/idp.py
+COPY --chown=mindspore:mindspore --chmod=640 傻瓜式教程.ipynb  ./
+COPY --chown=mindspore:mindspore --chmod=640 Jupyter操作文档.ipynb  ./
 # 暴露端口
 EXPOSE 8080
 
 # 真实执行命令
-CMD jupyter lab  --notebook-dir=/home/mindspore/work --ip='*' --port=8080 --no-browser --config /home/mindspore/work/idp.py
+CMD jupyter lab  --notebook-dir=/home/mindspore/work --ip='*' --port=8080 --no-browser --config /usr/lib/idp.py
