@@ -40,4 +40,4 @@ spec:
     - name: ACCESS_TOKEN_ENDPOINT
       value: "{{.AccessTokenEndpoint}}"
     - name: USER_POOL
-      vaule: "{{.UserPoolId}}"
+      value: "{{.UserPoolId}}"
