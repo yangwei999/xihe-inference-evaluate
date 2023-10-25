@@ -7,7 +7,6 @@ import (
 
 	"github.com/opensourceways/community-robot-lib/utils"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/cloudimpl"
-	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-inference-evaluate/k8sclient"
 )
@@ -48,7 +47,6 @@ type ConfigSetDefault interface {
 }
 
 type Config struct {
-	Evaluate  evaluateimpl.Config  `json:"evaluate"   required:"true"`
 	Inference inferenceimpl.Config `json:"inference"  required:"true"`
 	Cloud     cloudimpl.Config     `json:"cloud"      required:"true"`
 	K8sClient k8sclient.Config     `json:"k8s"        required:"true"`
@@ -57,7 +55,6 @@ type Config struct {
 func (cfg *Config) configItems() []interface{} {
 	return []interface{}{
 		&cfg.Inference,
-		&cfg.Evaluate,
 		&cfg.Cloud,
 		&cfg.K8sClient,
 	}
@@ -71,7 +68,6 @@ func (cfg *Config) SetDefault() {
 		}
 	}
 
-	cfg.Evaluate.OBS = cfg.Inference.OBS
 }
 
 func (cfg *Config) Validate() error {

@@ -6,6 +6,7 @@ type Inference struct {
 	LastCommit   string
 	UserToken    string
 	SurvivalTime int // seconds
+	Requester    string
 }
 
 type InferenceIndex struct {

@@ -1,6 +1,10 @@
 package cloudimpl
 
-import "github.com/opensourceways/xihe-inference-evaluate/infrastructure/config"
+import (
+	"os"
+
+	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/config"
+)
 
 type configValidate interface {
 	Validate() error
@@ -14,6 +18,7 @@ type Config struct {
 	CRD          config.CRDConfig `json:"crd"              required:"true"`
 	RPCEndpoint  string           `json:"rpc_endpiont"     required:"true"`
 	JupyterToken string           `json:"jupyter_token"    required:"true"`
+	UserPoolId   string           `json:"user_pool_id"    required:"true"`
 }
 
 func (cfg *Config) configItems() []interface{} {
@@ -29,6 +34,14 @@ func (cfg *Config) SetDefault() {
 		if f, ok := i.(configSetDefault); ok {
 			f.SetDefault()
 		}
+	}
+
+	if image, ok := os.LookupEnv("CLOUD_IMAGE"); ok {
+		cfg.CRD.CRDImage = image
+	}
+
+	if image, ok := os.LookupEnv("CLOUD_INIT_IMAGE"); ok {
+		cfg.CRD.CRDInitImage = image
 	}
 }
 

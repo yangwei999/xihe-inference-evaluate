@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/opensourceways/xihe-inference-evaluate/domain"
 	"github.com/opensourceways/xihe-inference-evaluate/domain/inference"
@@ -23,7 +24,7 @@ func (cmd *InferenceCreateCmd) Validate() error {
 		cmd.SurvivalTime <= 0
 
 	if b {
-		return errors.New("invalid cmd")
+		return fmt.Errorf("invalid cmd")
 	}
 
 	return nil

@@ -28,11 +28,11 @@ def _parse_model_path(path):
 
 def _load_config(path):
     result = []
-
+    project_name = os.getenv("PROJECT_NAME")
     # check the security path
     real_path = os.path.realpath(path)
-    if not real_path.startswith("/usr/src/app"):
-        raise (_InvalidModelPath("illegal model path"))
+    if not real_path.startswith(f"/workspace/{project_name}/inference"):
+        raise (_InvalidModelPath(f"illegal model path {real_path}"))
 
     with open(real_path, 'r') as f:
         data = json.load(f)

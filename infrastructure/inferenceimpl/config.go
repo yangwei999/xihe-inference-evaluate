@@ -2,6 +2,7 @@ package inferenceimpl
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 
 	"github.com/opensourceways/xihe-inference-evaluate/infrastructure/config"
@@ -36,6 +37,14 @@ func (cfg *Config) SetDefault() {
 		if f, ok := i.(configSetDefault); ok {
 			f.SetDefault()
 		}
+	}
+
+	if image, ok := os.LookupEnv("INFERENCE_IMAGE"); ok {
+		cfg.CRD.CRDImage = image
+	}
+
+	if image, ok := os.LookupEnv("INFERENCE_INIT_IMAGE"); ok {
+		cfg.CRD.CRDInitImage = image
 	}
 }
 

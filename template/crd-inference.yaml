@@ -9,6 +9,32 @@ metadata:
         {{end}}
 
 spec:
+  initContainers:
+    - name: init-codeserver
+      image: {{.InitImage}}
+      env:
+        - name: GITLAB_ENDPOINT
+          value: {{.GitlabEndPoint}}
+        - name: XIHE_USER
+          value: {{.XiheUser}}
+        - name: XIHE_USER_TOKEN
+          value: {{.XiheUserToken}}
+        - name: LAST_COMMIT
+          value: {{.LastCommit}}
+        - name: OBS_AK
+          value: {{.ObsAk}}
+        - name: OBS_SK
+          value: {{.ObsSk}}
+        - name: OBS_ENDPOINT
+          value: {{.ObsEndPoint}}
+        - name: OBS_UTIL_PATH
+          value: {{.ObsUtilPath}}
+        - name: OBS_BUCKET
+          value: {{.ObsBucket}}
+        - name: OBS_LFS_PATH
+          value: {{.ObsLfsPath}}
+        - name: PROJECT_NAME
+          value: {{.ProjectName}}
   runtime: generic
   subdomain: {{.Name}}
   image: {{.Image}}
@@ -17,6 +43,7 @@ spec:
   inactiveAfterSeconds: 0
   recycleAfterSeconds: {{.RecycleSeconds}}
   restartPolicy: Never
+  enableOauth2Proxy: true
   nodeSelector:
     inference: "true"
   resources:
@@ -27,29 +54,13 @@ spec:
   workspaceLocation: /workspace
   containerPort: "{{.ContainerPort}}"
   envs:
-    - name: GITLAB_ENDPOINT
-      value: {{.GitlabEndPoint}}
-    - name: XIHE_USER
-      value: {{.XiheUser}}
-    - name: XIHE_USER_TOKEN
-      value: {{.XiheUserToken}}
     - name: PROJECT_NAME
       value: {{.ProjectName}}
-    - name: LAST_COMMIT
-      value: {{.LastCommit}}
-    - name: OBS_AK
-      value: {{.ObsAk}}
-    - name: OBS_SK
-      value: {{.ObsSk}}
-    - name: OBS_ENDPOINT
-      value: {{.ObsEndPoint}}
-    - name: OBS_UTIL_PATH
-      value: {{.ObsUtilPath}}
-    - name: OBS_BUCKET
-      value: {{.ObsBucket}}
-    - name: OBS_LFS_PATH
-      value: {{.ObsLfsPath}}
     - name: GRADIO_SERVER_PORT
       value: "{{.ContainerPort}}"
     - name: GRADIO_SERVER_NAME
       value: "0.0.0.0"
+    - name: USER
+      value: "{{.User}}"
+    - name: ACCESS_TOKEN_ENDPOINT
+      value: "{{.AccessTokenEndpoint}}"

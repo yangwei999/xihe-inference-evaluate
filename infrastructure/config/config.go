@@ -7,6 +7,7 @@ import (
 
 type CRDConfig struct {
 	CRDImage     string `json:"crd_image"        required:"true"`
+	CRDInitImage string `json:"crd_init_image"`
 	TemplateFile string `json:"crd_template"     required:"true"`
 
 	// Specifies the terminal container port for connection
@@ -16,7 +17,8 @@ type CRDConfig struct {
 	CRDCpu float32 `json:"crd_cpu"               required:"true"`
 
 	// CrdMemory specifies the memory in megabyte.
-	CRDMemory int `json:"crd_memory"             required:"true"`
+	CRDMemory           int    `json:"crd_memory"             required:"true"`
+	AccessTokenEndpoint string `json:"access_token_endpoint" required:"true"`
 }
 
 func (cfg *CRDConfig) CRDCpuString() string {

@@ -1,7 +1,8 @@
 package domain
 
 type CloudPod struct {
-	PodId string
+	PodId        string
+	User         string
 	SurvivalTime SurvivalTime
 }
 

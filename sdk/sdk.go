@@ -9,14 +9,10 @@ import (
 	"github.com/opensourceways/community-robot-lib/utils"
 
 	"github.com/opensourceways/xihe-inference-evaluate/controller"
-	"github.com/opensourceways/xihe-inference-evaluate/domain"
 )
 
 type InferenceCreateOption = controller.InferenceCreateRequest
 type InferenceUpdateOption = controller.InferenceUpdateRequest
-
-type CustomEvaluateCreateOption = controller.CustomEvaluateCreateRequest
-type StandardEvaluateCreateOption = controller.StandardEvaluateCreateRequest
 
 type CloudPodCreateOption = controller.CloudPodCreateRequest
 
@@ -57,45 +53,6 @@ func (t InferenceEvaluate) ExtendExpiryOfInference(opt *InferenceUpdateOption) e
 	}
 
 	req, err := http.NewRequest(http.MethodPut, t.inferenceURL(), bytes.NewBuffer(payload))
-	if err != nil {
-		return err
-	}
-
-	return t.forwardTo(req, nil)
-}
-
-// evaluate
-func (t InferenceEvaluate) evaluateURL() string {
-	return fmt.Sprintf("%s/api/v1/evaluate/project", t.endpoint)
-}
-
-func (t InferenceEvaluate) CreateCustomEvaluate(opt *CustomEvaluateCreateOption) error {
-	payload, err := utils.JsonMarshal(&opt)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest(
-		http.MethodPost, t.evaluateURL()+"/"+domain.EvaluateTypeCustom,
-		bytes.NewBuffer(payload),
-	)
-	if err != nil {
-		return err
-	}
-
-	return t.forwardTo(req, nil)
-}
-
-func (t InferenceEvaluate) CreateStandardEvaluate(opt *StandardEvaluateCreateOption) error {
-	payload, err := utils.JsonMarshal(&opt)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest(
-		http.MethodPost, t.evaluateURL()+"/"+domain.EvaluateTypeStandard,
-		bytes.NewBuffer(payload),
-	)
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,25 @@
+FROM alpine:3.14 as BUILDER
+RUN apk update && apk add --no-cache \
+        git \
+        bash \
+        libc6-compat
+WORKDIR /opt/build
+COPY ./obsutil.tar.gz ./obsutil.tar.gz
+RUN tar -xf ./obsutil.tar.gz
+
+# real service
+FROM python:3.9.13
+
+USER root
+RUN groupadd --gid 5000 mindspore \
+  && useradd --home-dir /home/mindspore --create-home --uid 5000 --gid 5000 --shell /bin/sh --skel /dev/null mindspore
+
+USER mindspore
+
+WORKDIR /usr/src/app
+
+COPY --chown=mindspore:mindspore --chmod=550 ./prepare.sh ./prepare.sh
+COPY --chown=mindspore:mindspore --chmod=550 --from=BUILDER /opt/build/obsutil /usr/src/app/obsutil
+COPY --chown=mindspore:mindspore --chmod=550 ./pretrain.py ./pretrain.py
+
+ENTRYPOINT ["/usr/src/app/prepare.sh"]
