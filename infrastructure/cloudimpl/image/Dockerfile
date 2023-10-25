@@ -5,6 +5,7 @@ USER root
 
 # 安装时不interative
 ARG DEBIAN_FRONTEND=noninteractive
+ARG JUPYTER_TOKEN
 
 # 安装系统基础命令和依赖
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
